@@ -1,7 +1,5 @@
 package com.example.lacantera.data.remote
 
-
-
 import com.example.lacantera.data.model.LoginRequest
 import com.example.lacantera.data.model.LoginResponse
 import retrofit2.Response
