@@ -1,5 +1,6 @@
 package com.example.lacantera.data.remote
 
+import android.content.Context
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -8,23 +9,42 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    //private const val BASE_URL = "http://10.0.2.2:8000/"
+    /*
+     * Conserva aquí la IP que ya te funcionó en el teléfono físico.
+     *
+     * Ejemplo:
+     * http://192.168.1.50:8000/
+     */
     private const val BASE_URL = "http://192.168.1.8:8000/"
 
+    @Volatile
+    private var apiServiceInstance: ApiService? = null
 
-    private val okHttpClient = OkHttpClient.Builder()
-        // Evita que Retrofit/OkHttp use un proxy del emulador
-        .proxy(Proxy.NO_PROXY)
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
-        .writeTimeout(15, TimeUnit.SECONDS)
-        .build()
+    fun getApiService(context: Context): ApiService {
+        return apiServiceInstance ?: synchronized(this) {
+            apiServiceInstance ?: createApiService(context).also {
+                apiServiceInstance = it
+            }
+        }
+    }
 
-    val apiService: ApiService by lazy {
-        Retrofit.Builder()
+    private fun createApiService(context: Context): ApiService {
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(
+                AuthInterceptor(context.applicationContext)
+            )
+            .proxy(Proxy.NO_PROXY)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
             .build()
             .create(ApiService::class.java)
     }

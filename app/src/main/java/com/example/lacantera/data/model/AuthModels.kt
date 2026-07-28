@@ -1,6 +1,5 @@
 package com.example.lacantera.data.model
 
-
 import com.google.gson.annotations.SerializedName
 
 data class LoginRequest(
@@ -20,33 +19,48 @@ data class Usuario(
     val username: String,
 
     @SerializedName("first_name")
-    val firstName: String,
+    val firstName: String = "",
 
     @SerializedName("last_name")
-    val lastName: String,
+    val lastName: String = "",
 
     @SerializedName("nombre_corto")
-    val nombreCorto: String,
+    val nombreCorto: String = "",
 
-    val email: String,
-    val rol: String,
-    val telefono: String?,
+    val email: String = "",
+    val rol: String = "",
+
+    val telefono: String? = null,
 
     @SerializedName("fecha_nacimiento")
-    val fechaNacimiento: String?,
+    val fechaNacimiento: String? = null,
 
-    val nacionalidad: String?,
-    val sexo: String?,
+    val nacionalidad: String? = null,
+    val sexo: String? = null,
 
     @SerializedName("segundo_apellido")
-    val segundoApellido: String?,
+    val segundoApellido: String? = null,
 
     @SerializedName("estado_nacimiento")
-    val estadoNacimiento: String?,
+    val estadoNacimiento: String? = null,
 
     @SerializedName("must_change_password")
-    val mustChangePassword: Boolean,
+    val mustChangePassword: Boolean = false,
 
     @SerializedName("foto_url")
-    val fotoUrl: String?
+    val fotoUrl: String? = null,
+
+    @SerializedName("is_staff")
+    val isStaff: Boolean = false,
+
+    @SerializedName("is_superuser")
+    val isSuperuser: Boolean = false,
+
+    @SerializedName("is_capitan")
+    val isCapitan: Boolean = false,
+
+    @SerializedName("tipo_usuario")
+    val tipoUsuario: String = "sin_rol",
+
+    val permisos: UserPermissions = UserPermissions()
 )

@@ -28,7 +28,6 @@ fun AppNavGraph() {
         startDestination = Routes.SPLASH
     ) {
 
-        // Splash inicial
         composable(Routes.SPLASH) {
             SplashScreen(
                 onNavigateToPublicHome = {
@@ -50,7 +49,6 @@ fun AppNavGraph() {
             )
         }
 
-        // Inicio sin sesión
         composable(Routes.PUBLIC_HOME) {
             PublicHomeScreen(
                 onLoginClick = {
@@ -74,7 +72,6 @@ fun AppNavGraph() {
             )
         }
 
-        // Login
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
@@ -88,10 +85,17 @@ fun AppNavGraph() {
             )
         }
 
-        // Dashboard privado
         composable(Routes.DASHBOARD) {
             DashboardScreen(
                 onLogout = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.DASHBOARD) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onSessionExpired = {
                     navController.navigate(Routes.PUBLIC_HOME) {
                         popUpTo(Routes.DASHBOARD) {
                             inclusive = true
@@ -102,7 +106,6 @@ fun AppNavGraph() {
             )
         }
 
-        // Pantallas públicas provisionales
         composable(Routes.PROGRAMS) {
             PublicInformationScreen(
                 title = "Programas",
