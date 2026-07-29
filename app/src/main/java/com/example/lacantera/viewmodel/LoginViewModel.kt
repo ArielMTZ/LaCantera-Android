@@ -1,7 +1,9 @@
 package com.example.lacantera.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lacantera.data.local.SessionManager
 import com.example.lacantera.data.repository.AuthRepository
 import com.example.lacantera.ui.login.LoginUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,8 +13,16 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 class LoginViewModel(
-    private val repository: AuthRepository = AuthRepository()
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val repository = AuthRepository(
+        context = application.applicationContext
+    )
+
+    private val sessionManager = SessionManager(
+        context = application.applicationContext
+    )
 
     private val _uiState = MutableStateFlow(LoginUiState())
 
@@ -67,6 +77,15 @@ class LoginViewModel(
                     val body = response.body()
 
                     if (body != null) {
+                        sessionManager.saveSession(
+                            accessToken = body.access,
+                            refreshToken = body.refresh,
+                            userId = body.usuario.id,
+                            username = body.usuario.username,
+                            nombreCorto = body.usuario.nombreCorto,
+                            rol = body.usuario.rol
+                        )
+
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             loginSuccess = true,
@@ -94,10 +113,10 @@ class LoginViewModel(
                         errorMessage = message
                     )
                 }
-            } catch (_: IOException) {
+            } catch (exception: IOException) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = "No se pudo conectar con el servidor Django."
+                    errorMessage = "Error de conexión: ${exception.message}"
                 )
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
