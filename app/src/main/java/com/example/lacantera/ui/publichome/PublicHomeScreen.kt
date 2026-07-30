@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +26,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,12 +36,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.lacantera.R
+import com.example.lacantera.ui.components.PublicHeader
+import com.example.lacantera.ui.components.PublicTab
 import com.example.lacantera.ui.theme.BrandSerif
 import com.example.lacantera.ui.theme.LcBackground
 import com.example.lacantera.ui.theme.LcBlue
@@ -60,7 +57,6 @@ import com.example.lacantera.ui.theme.LcBorder
 import com.example.lacantera.ui.theme.LcGreen
 import com.example.lacantera.ui.theme.LcGreenSoft
 import com.example.lacantera.ui.theme.LcNavy
-import com.example.lacantera.ui.theme.LcNavyDark
 import com.example.lacantera.ui.theme.LcRed
 import com.example.lacantera.ui.theme.LcRedSoft
 import com.example.lacantera.ui.theme.LcSurface
@@ -105,10 +101,12 @@ fun PublicHomeScreen(
     ) {
         item {
             PublicHeader(
-                onLoginClick = onLoginClick,
+                selectedTab = PublicTab.HOME,
+                onHomeClick = {},
                 onStandingsClick = onStandingsClick,
                 onTeamsClick = onTeamsClick,
-                onRolesClick = onRolesClick
+                onRolesClick = onRolesClick,
+                onLoginClick = onLoginClick
             )
         }
 
@@ -147,6 +145,14 @@ fun PublicHomeScreen(
         }
     }
 
+    if (showTransferDialog) {
+        TransferDialog(
+            onDismiss = {
+                showTransferDialog = false
+            }
+        )
+    }
+
     if (showFeaturedEvent) {
         PosterDialog(
             imageRes = R.drawable.cantera_alien_2,
@@ -156,14 +162,6 @@ fun PublicHomeScreen(
             contentDescription = "Cartel del Torneo Alien 2026",
             onDismiss = {
                 showFeaturedEvent = false
-            }
-        )
-    }
-
-    if (showTransferDialog) {
-        TransferDataDialog(
-            onDismiss = {
-                showTransferDialog = false
             }
         )
     }
@@ -194,194 +192,6 @@ fun PublicHomeScreen(
                 }
             )
         }
-    }
-}
-
-@Composable
-private fun PublicHeader(
-    onLoginClick: () -> Unit,
-    onStandingsClick: () -> Unit,
-    onTeamsClick: () -> Unit,
-    onRolesClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(LcNavy)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 14.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            LogoMark()
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Text(
-                text = "La Cantera",
-                modifier = Modifier.weight(1f),
-                color = LcWhite,
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            OutlinedButton(
-                onClick = onLoginClick,
-                shape = RoundedCornerShape(10.dp),
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = LcWhite.copy(alpha = 0.22f)
-                ),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = LcWhite.copy(alpha = 0.07f),
-                    contentColor = LcWhite
-                ),
-                contentPadding = PaddingValues(
-                    horizontal = 14.dp,
-                    vertical = 8.dp
-                )
-            ) {
-                Text(
-                    text = "Iniciar sesión",
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-        }
-
-        HorizontalDivider(
-            color = LcWhite.copy(alpha = 0.10f)
-        )
-
-        PublicNavigation(
-            onStandingsClick = onStandingsClick,
-            onTeamsClick = onTeamsClick,
-            onRolesClick = onRolesClick
-        )
-    }
-}
-
-@Composable
-private fun LogoMark() {
-    Image(
-        painter = painterResource(
-            id = R.drawable.logo
-        ),
-        contentDescription = "Logo de La Cantera",
-        modifier = Modifier.size(42.dp),
-        contentScale = ContentScale.Fit
-    )
-}
-
-@Composable
-private fun PublicNavigation(
-    onStandingsClick: () -> Unit,
-    onTeamsClick: () -> Unit,
-    onRolesClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(LcNavyDark),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PublicNavigationItem(
-            label = "Inicio",
-            symbol = "⌂",
-            selected = true,
-            onClick = {}
-        )
-
-        PublicNavigationItem(
-            label = "Posiciones",
-            symbol = "▦",
-            selected = false,
-            onClick = onStandingsClick
-        )
-
-        PublicNavigationItem(
-            label = "Equipos",
-            symbol = "●●●",
-            selected = false,
-            onClick = onTeamsClick
-        )
-
-        PublicNavigationItem(
-            label = "Roles",
-            symbol = "▣",
-            selected = false,
-            onClick = onRolesClick
-        )
-    }
-}
-
-@Composable
-private fun RowScope.PublicNavigationItem(
-    label: String,
-    symbol: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .clickable(onClick = onClick)
-            .padding(
-                top = 10.dp,
-                bottom = 7.dp
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = symbol,
-            color = if (selected) {
-                Color(0xFF62A3FF)
-            } else {
-                LcWhite.copy(alpha = 0.45f)
-            },
-            fontSize = if (label == "Equipos") {
-                9.sp
-            } else {
-                17.sp
-            },
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(3.dp))
-
-        Text(
-            text = label,
-            color = if (selected) {
-                Color(0xFF62A3FF)
-            } else {
-                LcWhite.copy(alpha = 0.48f)
-            },
-            fontSize = 10.sp,
-            fontWeight = if (selected) {
-                FontWeight.SemiBold
-            } else {
-                FontWeight.Normal
-            }
-        )
-
-        Spacer(modifier = Modifier.height(5.dp))
-
-        Box(
-            modifier = Modifier
-                .width(24.dp)
-                .height(2.dp)
-                .background(
-                    color = if (selected) {
-                        Color(0xFF62A3FF)
-                    } else {
-                        Color.Transparent
-                    },
-                    shape = CircleShape
-                )
-        )
     }
 }
 
@@ -590,7 +400,9 @@ private fun NoticeCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(17.dp),
         colors = CardDefaults.cardColors(
             containerColor = LcSurface
@@ -633,7 +445,6 @@ private fun NoticeCard(
 
                 Text(
                     text = "$actionText  →",
-                    modifier = Modifier.clickable(onClick = onClick),
                     color = actionColor,
                     style = MaterialTheme.typography.labelLarge
                 )
@@ -923,190 +734,6 @@ private fun SocialButton(
 }
 
 @Composable
-private fun TransferDataDialog(
-    onDismiss: () -> Unit
-) {
-    val clipboardManager = LocalClipboardManager.current
-    val clabe = "0021 6470 2272 2869 33"
-
-    Dialog(
-        onDismissRequest = onDismiss
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = LcSurface
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 16.dp
-            )
-        ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color(0xFF2459D8),
-                                    Color(0xFF438AF4)
-                                )
-                            )
-                        )
-                        .padding(18.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(end = 42.dp)
-                    ) {
-                        Text(
-                            text = "Datos para\ntransferencia\nbancaria",
-                            color = LcWhite,
-                            fontSize = 22.sp,
-                            lineHeight = 24.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Liga de Voleibol La Cantera · Temporada 2026",
-                            color = LcWhite.copy(alpha = 0.78f),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    Surface(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(34.dp)
-                            .clickable(onClick = onDismiss),
-                        shape = CircleShape,
-                        color = LcWhite.copy(alpha = 0.18f)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "×",
-                                color = LcWhite,
-                                fontSize = 23.sp
-                            )
-                        }
-                    }
-                }
-
-                Column(
-                    modifier = Modifier.padding(18.dp)
-                ) {
-                    Text(
-                        text = "Realiza tu pago de inscripción o mensualidad mediante transferencia a la siguiente cuenta:",
-                        color = LcTextSecondary,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    TransferDataRow(
-                        label = "NOMBRE",
-                        value = "Daniel Treviño Soto"
-                    )
-
-                    HorizontalDivider(color = LcBorder)
-
-                    TransferDataRow(
-                        label = "BANCO",
-                        value = "Banamex"
-                    )
-
-                    HorizontalDivider(color = LcBorder)
-
-                    TransferDataRow(
-                        label = "CLABE",
-                        value = clabe,
-                        valueColor = LcBlue
-                    )
-
-                    HorizontalDivider(color = LcBorder)
-
-                    TransferDataRow(
-                        label = "CONCEPTO",
-                        value = "Pago y equipo"
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            clipboardManager.setText(
-                                AnnotatedString(clabe.replace(" ", ""))
-                            )
-                        },
-                        shape = RoundedCornerShape(9.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = LcBlueSoft,
-                            contentColor = LcBlue
-                        ),
-                        contentPadding = PaddingValues(
-                            horizontal = 14.dp,
-                            vertical = 10.dp
-                        )
-                    ) {
-                        Text(
-                            text = "▣  Copiar número de cuenta",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    HorizontalDivider(color = LcBorder)
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Text(
-                        text = "Recuerda enviar tu comprobante de pago al WhatsApp de La Cantera: (656) 130 8025",
-                        color = LcTextMuted,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TransferDataRow(
-    label: String,
-    value: String,
-    valueColor: Color = LcTextPrimary
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 11.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            modifier = Modifier.width(78.dp),
-            color = LcTextMuted,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.7.sp
-        )
-
-        Text(
-            text = value,
-            modifier = Modifier.weight(1f),
-            color = valueColor,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
-
-@Composable
 private fun PosterDialog(
     imageRes: Int,
     label: String,
@@ -1190,6 +817,89 @@ private fun PosterDialog(
                         text = description,
                         color = LcWhite.copy(alpha = 0.78f),
                         style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransferDialog(
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = LcSurface
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 14.dp
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(22.dp)
+            ) {
+                Text(
+                    text = "Datos para transferencia bancaria",
+                    color = LcNavy,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Consulta la cuenta y los datos necesarios para realizar tu pago de inscripción o mensualidad.",
+                    color = LcTextSecondary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    color = LcBlueSoft
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Información bancaria",
+                            color = LcNavy,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Solicita a la administración los datos bancarios y la referencia correspondiente antes de realizar tu transferencia.",
+                            color = LcTextSecondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(22.dp))
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = LcNavy,
+                        contentColor = LcWhite
+                    )
+                ) {
+                    Text(
+                        text = "Cerrar",
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

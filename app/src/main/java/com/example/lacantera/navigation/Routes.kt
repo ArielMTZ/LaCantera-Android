@@ -12,7 +12,13 @@ object Routes {
     const val SUPPORT = "support"
 
     const val LOGIN = "login"
+
+    // Dashboard administrativo
     const val DASHBOARD = "dashboard"
+
+    // Dashboards por rol
+    const val DASHBOARD_REFEREE = "dashboard_referee"
+    const val DASHBOARD_CAPTAIN = "dashboard_captain"
 
     const val MATCHDAYS = "matchdays"
 }

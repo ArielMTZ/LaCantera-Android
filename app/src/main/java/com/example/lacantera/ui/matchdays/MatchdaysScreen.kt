@@ -132,17 +132,12 @@ fun MatchdaysScreen(
     ) {
         item {
             PublicHeader(
-                onLoginClick = onLoginClick
-            )
-        }
-
-        item {
-            PublicNavigation(
                 selectedTab = PublicTab.MATCHDAYS,
                 onHomeClick = onHomeClick,
                 onStandingsClick = onStandingsClick,
                 onTeamsClick = onTeamsClick,
-                onRolesClick = onRolesClick
+                onRolesClick = onRolesClick,
+                onLoginClick = onLoginClick
             )
         }
 
