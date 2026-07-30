@@ -1,6 +1,8 @@
 package com.example.lacantera.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,18 +10,15 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Leaderboard
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,8 +28,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lacantera.ui.theme.LcNavyDark
-import com.example.lacantera.ui.theme.LcWhite
 
 enum class PublicTab {
     HOME,
@@ -47,48 +44,41 @@ fun PublicNavigation(
     onTeamsClick: () -> Unit,
     onRolesClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = LcNavyDark
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(88.dp)
+            .background(Color(0xFF031334)),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            HorizontalDivider(
-                color = Color(0xFF315A9C),
-                thickness = 1.dp
-            )
+        NavigationItem(
+            label = "Inicio",
+            icon = Icons.Rounded.Home,
+            selected = selectedTab == PublicTab.HOME,
+            onClick = onHomeClick
+        )
 
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                NavigationItem(
-                    label = "Inicio",
-                    icon = Icons.Filled.Home,
-                    selected = selectedTab == PublicTab.HOME,
-                    onClick = onHomeClick
-                )
+        NavigationItem(
+            label = "Posiciones",
+            icon = Icons.Rounded.BarChart,
+            selected = selectedTab == PublicTab.STANDINGS,
+            onClick = onStandingsClick
+        )
 
-                NavigationItem(
-                    label = "Posiciones",
-                    icon = Icons.Filled.Leaderboard,
-                    selected = selectedTab == PublicTab.STANDINGS,
-                    onClick = onStandingsClick
-                )
+        NavigationItem(
+            label = "Equipos",
+            icon = Icons.Rounded.Groups,
+            selected = selectedTab == PublicTab.TEAMS,
+            onClick = onTeamsClick
+        )
 
-                NavigationItem(
-                    label = "Equipos",
-                    icon = Icons.Filled.Groups,
-                    selected = selectedTab == PublicTab.TEAMS,
-                    onClick = onTeamsClick
-                )
-
-                NavigationItem(
-                    label = "Roles",
-                    icon = Icons.Filled.CalendarMonth,
-                    selected = selectedTab == PublicTab.MATCHDAYS,
-                    onClick = onRolesClick
-                )
-            }
-        }
+        NavigationItem(
+            label = "Roles",
+            icon = Icons.Rounded.CalendarMonth,
+            selected = selectedTab == PublicTab.MATCHDAYS,
+            onClick = onRolesClick
+        )
     }
 }
 
@@ -99,37 +89,31 @@ private fun RowScope.NavigationItem(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val selectedColor = Color(0xFF62A3FF)
-
-    val contentColor = if (selected) {
-        selectedColor
-    } else {
-        LcWhite.copy(alpha = 0.43f)
-    }
+    val selectedColor = Color(0xFF5AA7FF)
+    val unselectedColor = Color(0xFF8290AA)
+    val itemColor = if (selected) selectedColor else unselectedColor
 
     Column(
         modifier = Modifier
             .weight(1f)
-            .clickable(onClick = onClick)
-            .padding(
-                top = 12.dp,
-                bottom = 8.dp
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .height(88.dp)
+            .clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
-            modifier = Modifier.size(23.dp),
-            tint = contentColor
+            modifier = Modifier.size(25.dp),
+            tint = itemColor
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = label,
-            color = contentColor,
-            fontSize = 10.sp,
+            color = itemColor,
+            fontSize = 11.sp,
             fontWeight = if (selected) {
                 FontWeight.SemiBold
             } else {
@@ -137,23 +121,20 @@ private fun RowScope.NavigationItem(
             }
         )
 
-        Spacer(modifier = Modifier.height(7.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Box(
             modifier = Modifier
-                .width(28.dp)
-                .height(2.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (selected) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp),
-                    color = selectedColor,
-                    shape = CircleShape
-                ) {}
-            }
-        }
+                .width(34.dp)
+                .height(3.dp)
+                .background(
+                    color = if (selected) {
+                        selectedColor
+                    } else {
+                        Color.Transparent
+                    },
+                    shape = RoundedCornerShape(50)
+                )
+        )
     }
 }

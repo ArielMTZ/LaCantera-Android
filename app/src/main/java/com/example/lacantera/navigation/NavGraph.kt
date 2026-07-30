@@ -19,6 +19,7 @@ import com.example.lacantera.ui.publichome.PublicHomeScreen
 import com.example.lacantera.ui.splash.SplashScreen
 import com.example.lacantera.ui.rules.RulesScreen
 import com.example.lacantera.ui.matchdays.MatchdaysScreen
+import com.example.lacantera.ui.login.DashboardType
 
 @Composable
 fun AppNavGraph() {
@@ -75,7 +76,7 @@ fun AppNavGraph() {
                     // Posiciones
                 },
                 onTeamsClick = {
-                    // Equipos 
+                    // Equipos
                 },
                 onRolesClick = {
                     navController.navigate(Routes.MATCHDAYS) {
@@ -87,13 +88,35 @@ fun AppNavGraph() {
 
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate(Routes.DASHBOARD) {
+                onLoginSuccess = { dashboardType ->
+
+                    val destination = when (dashboardType) {
+                        DashboardType.ADMIN -> {
+                            Routes.DASHBOARD
+                        }
+
+                        DashboardType.REFEREE -> {
+                            Routes.DASHBOARD_REFEREE
+                        }
+
+                        DashboardType.CAPTAIN -> {
+                            Routes.DASHBOARD_CAPTAIN
+                        }
+                    }
+
+                    navController.navigate(destination) {
                         popUpTo(Routes.PUBLIC_HOME) {
                             inclusive = true
                         }
+
                         launchSingleTop = true
                     }
+                },
+                onBackToHome = {
+                    navController.popBackStack()
+                },
+                onForgotPasswordClick = {
+
                 }
             )
         }
@@ -113,6 +136,37 @@ fun AppNavGraph() {
                         popUpTo(Routes.DASHBOARD) {
                             inclusive = true
                         }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable(Routes.DASHBOARD_REFEREE) {
+            RoleDashboardScreen(
+                title = "Dashboard Árbitro",
+                message = "Sesión iniciada correctamente como árbitro.",
+                onLogout = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.DASHBOARD_REFEREE) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(Routes.DASHBOARD_CAPTAIN) {
+            RoleDashboardScreen(
+                title = "Dashboard Capitán",
+                message = "Sesión iniciada correctamente como capitán.",
+                onLogout = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.DASHBOARD_CAPTAIN) {
+                            inclusive = true
+                        }
+
                         launchSingleTop = true
                     }
                 }
@@ -216,6 +270,39 @@ private fun PublicInformationScreen(
             onClick = onBackClick
         ) {
             Text(text = "Regresar")
+        }
+    }
+}
+@Composable
+private fun RoleDashboardScreen(
+    title: String,
+    message: String,
+    onLogout: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = title
+        )
+
+        Text(
+            text = message,
+            modifier = Modifier.padding(
+                vertical = 20.dp
+            )
+        )
+
+        Button(
+            onClick = onLogout
+        ) {
+            Text(
+                text = "Cerrar sesión"
+            )
         }
     }
 }
