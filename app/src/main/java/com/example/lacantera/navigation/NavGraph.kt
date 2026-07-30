@@ -17,6 +17,8 @@ import com.example.lacantera.ui.dashboard.DashboardScreen
 import com.example.lacantera.ui.login.LoginScreen
 import com.example.lacantera.ui.publichome.PublicHomeScreen
 import com.example.lacantera.ui.splash.SplashScreen
+import com.example.lacantera.ui.rules.RulesScreen
+import com.example.lacantera.ui.matchdays.MatchdaysScreen
 
 @Composable
 fun AppNavGraph() {
@@ -68,6 +70,17 @@ fun AppNavGraph() {
                 },
                 onSupportClick = {
                     navController.navigate(Routes.SUPPORT)
+                },
+                onStandingsClick = {
+                    // Posiciones
+                },
+                onTeamsClick = {
+                    // Equipos 
+                },
+                onRolesClick = {
+                    navController.navigate(Routes.MATCHDAYS) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -117,9 +130,7 @@ fun AppNavGraph() {
         }
 
         composable(Routes.RULES) {
-            PublicInformationScreen(
-                title = "Reglamento",
-                message = "Aquí mostraremos el reglamento de La Cantera.",
+            RulesScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -152,6 +163,29 @@ fun AppNavGraph() {
                 message = "Aquí mostraremos la información de contacto y soporte.",
                 onBackClick = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.MATCHDAYS) {
+            MatchdaysScreen(
+                onHomeClick = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.PUBLIC_HOME) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onRolesClick = {},
+                onLoginClick = {
+                    navController.navigate(Routes.LOGIN)
+                },
+                onPrivacyClick = {
+                    navController.navigate(Routes.PRIVACY)
+                },
+                onTermsClick = {
+                    navController.navigate(Routes.TERMS)
                 }
             )
         }
