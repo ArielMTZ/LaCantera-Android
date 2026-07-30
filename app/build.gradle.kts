@@ -56,6 +56,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
+
     // ViewModel y estados compatibles con Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -66,6 +67,7 @@ dependencies {
     // Sesión persistente
     implementation(libs.androidx.datastore.preferences)
     implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation("androidx.compose.material:material-icons-extended")
 
 
     // Retrofit
