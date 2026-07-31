@@ -3,31 +3,24 @@ package com.example.lacantera.data.repository
 import android.content.Context
 import com.example.lacantera.data.local.SessionManager
 import com.example.lacantera.data.model.TokenRefreshRequest
-import com.example.lacantera.data.remote.RetrofitClient
+import com.example.lacantera.data.remote.RefreshTokenClient
 import kotlinx.coroutines.flow.first
 
 class TokenRepository(
     context: Context
 ) {
-
-    private val appContext = context.applicationContext
-
     private val sessionManager = SessionManager(
-        context = appContext
+        context = context.applicationContext
     )
 
-    private val apiService =
-        RetrofitClient.getApiService(appContext)
-
     suspend fun refreshAccessToken(): String? {
-        val refreshToken =
-            sessionManager.refreshToken.first()
+        val refreshToken = sessionManager.refreshToken.first()
 
         if (refreshToken.isNullOrBlank()) {
             return null
         }
 
-        val response = apiService.refreshToken(
+        val response = RefreshTokenClient.api.refreshToken(
             request = TokenRefreshRequest(
                 refresh = refreshToken
             )
