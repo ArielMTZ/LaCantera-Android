@@ -30,8 +30,6 @@ class SplashViewModel(
 
     private fun checkSession() {
         viewModelScope.launch {
-
-            // Permite mostrar brevemente la pantalla Splash.
             delay(1_200)
 
             val session = sessionManager.userSession.first()
@@ -41,16 +39,34 @@ class SplashViewModel(
                         !session.accessToken.isNullOrBlank() &&
                         !session.refreshToken.isNullOrBlank()
 
-            val destination = if (hasValidLocalSession) {
-                SplashDestination.DASHBOARD
-            } else {
+            val destination = if (!hasValidLocalSession) {
                 SplashDestination.PUBLIC_HOME
+            } else {
+                resolveDestination(session.rol)
             }
 
             _uiState.value = SplashUiState(
                 isLoading = false,
                 destination = destination
             )
+        }
+    }
+
+    private fun resolveDestination(
+        role: String
+    ): SplashDestination {
+        return when (role.trim().lowercase()) {
+            "arbitro" -> SplashDestination.DASHBOARD_REFEREE
+            "capitan" -> SplashDestination.DASHBOARD_CAPTAIN
+
+            "superadmin",
+            "staff",
+            "admin_principal",
+            "admin",
+            "finanzas",
+            "subadmin" -> SplashDestination.DASHBOARD_ADMIN
+
+            else -> SplashDestination.PUBLIC_HOME
         }
     }
 }
@@ -62,5 +78,7 @@ data class SplashUiState(
 
 enum class SplashDestination {
     PUBLIC_HOME,
-    DASHBOARD
+    DASHBOARD_ADMIN,
+    DASHBOARD_REFEREE,
+    DASHBOARD_CAPTAIN
 }

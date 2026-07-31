@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,15 +27,31 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun SplashScreen(
     onNavigateToPublicHome: () -> Unit,
-    onNavigateToDashboard: () -> Unit,
+    onNavigateToAdminDashboard: () -> Unit,
+    onNavigateToRefereeDashboard: () -> Unit,
+    onNavigateToCaptainDashboard: () -> Unit,
     viewModel: SplashViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState.destination) {
         when (uiState.destination) {
-            SplashDestination.PUBLIC_HOME -> onNavigateToPublicHome()
-            SplashDestination.DASHBOARD -> onNavigateToDashboard()
+            SplashDestination.PUBLIC_HOME -> {
+                onNavigateToPublicHome()
+            }
+
+            SplashDestination.DASHBOARD_ADMIN -> {
+                onNavigateToAdminDashboard()
+            }
+
+            SplashDestination.DASHBOARD_REFEREE -> {
+                onNavigateToRefereeDashboard()
+            }
+
+            SplashDestination.DASHBOARD_CAPTAIN -> {
+                onNavigateToCaptainDashboard()
+            }
+
             null -> Unit
         }
     }
@@ -53,7 +70,7 @@ fun SplashScreen(
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "LC",
                 color = Color(0xFF071B4A),
                 fontSize = 38.sp,
@@ -63,14 +80,14 @@ fun SplashScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        androidx.compose.material3.Text(
+        Text(
             text = "LA CANTERA",
             color = Color.White,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold
         )
 
-        androidx.compose.material3.Text(
+        Text(
             text = "Centro Deportivo",
             color = Color.White.copy(alpha = 0.75f),
             fontSize = 16.sp
