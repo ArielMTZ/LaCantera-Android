@@ -38,20 +38,39 @@ fun AppNavGraph() {
                         popUpTo(Routes.SPLASH) {
                             inclusive = true
                         }
+
                         launchSingleTop = true
                     }
                 },
-                onNavigateToDashboard = {
+                onNavigateToAdminDashboard = {
                     navController.navigate(Routes.DASHBOARD) {
                         popUpTo(Routes.SPLASH) {
                             inclusive = true
                         }
+
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToRefereeDashboard = {
+                    navController.navigate(Routes.DASHBOARD_REFEREE) {
+                        popUpTo(Routes.SPLASH) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToCaptainDashboard = {
+                    navController.navigate(Routes.DASHBOARD_CAPTAIN) {
+                        popUpTo(Routes.SPLASH) {
+                            inclusive = true
+                        }
+
                         launchSingleTop = true
                     }
                 }
             )
         }
-
         composable(Routes.PUBLIC_HOME) {
             PublicHomeScreen(
                 onLoginClick = {
@@ -142,10 +161,17 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.DASHBOARD_REFEREE) {
-            RoleDashboardScreen(
-                title = "Dashboard Árbitro",
-                message = "Sesión iniciada correctamente como árbitro.",
+            DashboardScreen(
                 onLogout = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.DASHBOARD_REFEREE) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                },
+                onSessionExpired = {
                     navController.navigate(Routes.PUBLIC_HOME) {
                         popUpTo(Routes.DASHBOARD_REFEREE) {
                             inclusive = true
@@ -158,10 +184,17 @@ fun AppNavGraph() {
         }
 
         composable(Routes.DASHBOARD_CAPTAIN) {
-            RoleDashboardScreen(
-                title = "Dashboard Capitán",
-                message = "Sesión iniciada correctamente como capitán.",
+            DashboardScreen(
                 onLogout = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.DASHBOARD_CAPTAIN) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                },
+                onSessionExpired = {
                     navController.navigate(Routes.PUBLIC_HOME) {
                         popUpTo(Routes.DASHBOARD_CAPTAIN) {
                             inclusive = true
@@ -273,36 +306,4 @@ private fun PublicInformationScreen(
         }
     }
 }
-@Composable
-private fun RoleDashboardScreen(
-    title: String,
-    message: String,
-    onLogout: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = title
-        )
 
-        Text(
-            text = message,
-            modifier = Modifier.padding(
-                vertical = 20.dp
-            )
-        )
-
-        Button(
-            onClick = onLogout
-        ) {
-            Text(
-                text = "Cerrar sesión"
-            )
-        }
-    }
-}
