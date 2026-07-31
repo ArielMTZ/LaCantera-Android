@@ -9,13 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    /*
-     * Conserva aquí la IP que ya te funcionó en el teléfono físico.
-     *
-     * Ejemplo:
-     * http://192.168.1.50:8000/
-     */
-    private const val BASE_URL = "http://192.168.1.8:8000/"
+    private const val BASE_URL = "http://192.168.1.5:8000/"
 
     @Volatile
     private var apiServiceInstance: ApiService? = null
@@ -29,11 +23,20 @@ object RetrofitClient {
     }
 
     private fun createApiService(context: Context): ApiService {
+        val appContext = context.applicationContext
+
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(
-                AuthInterceptor(context.applicationContext)
-            )
             .proxy(Proxy.NO_PROXY)
+            .addInterceptor(
+                AuthInterceptor(
+                    context = appContext
+                )
+            )
+            .authenticator(
+                TokenAuthenticator(
+                    context = appContext
+                )
+            )
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)

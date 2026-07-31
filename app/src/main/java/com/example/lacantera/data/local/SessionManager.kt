@@ -96,6 +96,19 @@ class SessionManager(
         }
     }
 
+    suspend fun updateTokens(
+        accessToken: String,
+        refreshToken: String? = null
+    ) {
+        context.sessionDataStore.edit { preferences ->
+            preferences[Keys.ACCESS_TOKEN] = accessToken
+
+            if (!refreshToken.isNullOrBlank()) {
+                preferences[Keys.REFRESH_TOKEN] = refreshToken
+            }
+        }
+    }
+
     suspend fun clearSession() {
         context.sessionDataStore.edit { preferences ->
             preferences.clear()
@@ -112,3 +125,5 @@ data class UserSession(
     val refreshToken: String?,
     val isLoggedIn: Boolean
 )
+
+
