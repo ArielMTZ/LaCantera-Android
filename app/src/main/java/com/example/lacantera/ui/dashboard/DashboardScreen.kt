@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun DashboardScreen(
     onLogout: () -> Unit,
     onSessionExpired: () -> Unit,
+    onNavigateToTeams: () -> Unit,
     viewModel: DashboardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -170,7 +171,10 @@ fun DashboardScreen(
         }
 
         if (uiState.permisos.administrarEquipos) {
-            DashboardOptionButton("Administrar equipos")
+            DashboardOptionButton(
+                title = "Administrar equipos",
+                onClick = onNavigateToTeams
+            )
         }
 
         if (uiState.permisos.administrarUsuarios) {
@@ -330,12 +334,11 @@ private fun DashboardStatCard(
 
 @Composable
 private fun DashboardOptionButton(
-    title: String
+    title: String,
+    onClick: () -> Unit = {}
 ) {
     Button(
-        onClick = {
-            // Aquí agregaremos navegación a cada módulo.
-        },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 10.dp)

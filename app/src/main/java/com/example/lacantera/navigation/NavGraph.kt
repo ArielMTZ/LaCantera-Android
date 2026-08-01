@@ -7,19 +7,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.lacantera.ui.dashboard.DashboardScreen
-import com.example.lacantera.ui.login.LoginScreen
-import com.example.lacantera.ui.publichome.PublicHomeScreen
-import com.example.lacantera.ui.splash.SplashScreen
-import com.example.lacantera.ui.rules.RulesScreen
-import com.example.lacantera.ui.matchdays.MatchdaysScreen
 import com.example.lacantera.ui.login.DashboardType
+import com.example.lacantera.ui.login.LoginScreen
+import com.example.lacantera.ui.matchdays.MatchdaysScreen
+import com.example.lacantera.ui.publichome.PublicHomeScreen
+import com.example.lacantera.ui.rules.RulesScreen
+import com.example.lacantera.ui.splash.SplashScreen
+import com.example.lacantera.ui.teams.TeamDetailScreen
+import com.example.lacantera.ui.teams.TeamsScreen
 
 @Composable
 fun AppNavGraph() {
@@ -71,6 +77,7 @@ fun AppNavGraph() {
                 }
             )
         }
+
         composable(Routes.PUBLIC_HOME) {
             PublicHomeScreen(
                 onLoginClick = {
@@ -95,7 +102,7 @@ fun AppNavGraph() {
                     // Posiciones
                 },
                 onTeamsClick = {
-                    // Equipos
+                    // Equipos públicos
                 },
                 onRolesClick = {
                     navController.navigate(Routes.MATCHDAYS) {
@@ -135,7 +142,7 @@ fun AppNavGraph() {
                     navController.popBackStack()
                 },
                 onForgotPasswordClick = {
-
+                    // Recuperación de contraseña
                 }
             )
         }
@@ -147,6 +154,7 @@ fun AppNavGraph() {
                         popUpTo(Routes.DASHBOARD) {
                             inclusive = true
                         }
+
                         launchSingleTop = true
                     }
                 },
@@ -155,11 +163,18 @@ fun AppNavGraph() {
                         popUpTo(Routes.DASHBOARD) {
                             inclusive = true
                         }
+
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToTeams = {
+                    navController.navigate(Routes.TEAMS) {
                         launchSingleTop = true
                     }
                 }
             )
         }
+
         composable(Routes.DASHBOARD_REFEREE) {
             DashboardScreen(
                 onLogout = {
@@ -177,6 +192,11 @@ fun AppNavGraph() {
                             inclusive = true
                         }
 
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToTeams = {
+                    navController.navigate(Routes.TEAMS) {
                         launchSingleTop = true
                     }
                 }
@@ -197,6 +217,88 @@ fun AppNavGraph() {
                 onSessionExpired = {
                     navController.navigate(Routes.PUBLIC_HOME) {
                         popUpTo(Routes.DASHBOARD_CAPTAIN) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToTeams = {
+                    navController.navigate(Routes.TEAMS) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(Routes.TEAMS) { backStackEntry ->
+
+            val refreshTeams by backStackEntry
+                .savedStateHandle
+                .getStateFlow(
+                    key = "refresh_teams",
+                    initialValue = false
+                )
+                .collectAsState()
+
+            TeamsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onTeamClick = { teamId ->
+                    navController.navigate(
+                        Routes.teamDetail(teamId)
+                    )
+                },
+                refreshRequested = refreshTeams,
+                onRefreshConsumed = {
+                    backStackEntry.savedStateHandle[
+                        "refresh_teams"
+                    ] = false
+                },
+                onSessionExpired = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.TEAMS) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = Routes.TEAM_DETAIL,
+            arguments = listOf(
+                navArgument("teamId") {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+
+            val teamId = backStackEntry.arguments
+                ?.getInt("teamId")
+                ?: return@composable
+
+            TeamDetailScreen(
+                teamId = teamId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onUpdateCompleted = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "refresh_teams",
+                            true
+                        )
+
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(Routes.PUBLIC_HOME) {
+                        popUpTo(Routes.TEAM_DETAIL) {
                             inclusive = true
                         }
 
@@ -261,6 +363,7 @@ fun AppNavGraph() {
                         popUpTo(Routes.PUBLIC_HOME) {
                             inclusive = false
                         }
+
                         launchSingleTop = true
                     }
                 },
@@ -292,18 +395,23 @@ private fun PublicInformationScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = title)
+        Text(
+            text = title
+        )
 
         Text(
             text = message,
-            modifier = Modifier.padding(vertical = 20.dp)
+            modifier = Modifier.padding(
+                vertical = 20.dp
+            )
         )
 
         Button(
             onClick = onBackClick
         ) {
-            Text(text = "Regresar")
+            Text(
+                text = "Regresar"
+            )
         }
     }
 }
-
