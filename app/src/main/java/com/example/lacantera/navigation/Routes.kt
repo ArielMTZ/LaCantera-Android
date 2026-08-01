@@ -13,12 +13,17 @@ object Routes {
 
     const val LOGIN = "login"
 
-    // Dashboard administrativo
     const val DASHBOARD = "dashboard"
-
-    // Dashboards por rol
     const val DASHBOARD_REFEREE = "dashboard_referee"
     const val DASHBOARD_CAPTAIN = "dashboard_captain"
 
     const val MATCHDAYS = "matchdays"
+
+    const val TEAMS = "teams"
+
+    const val TEAM_DETAIL = "team_detail/{teamId}"
+
+    fun teamDetail(teamId: Int): String {
+        return "team_detail/$teamId"
+    }
 }
