@@ -4,14 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -24,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,6 +62,7 @@ fun DashboardScreen(
         ) {
             CircularProgressIndicator()
         }
+
         return
     }
 
@@ -72,7 +78,6 @@ fun DashboardScreen(
         "finanzas" -> "Finanzas"
         "arbitro" -> "Árbitro"
         "capitan" -> "Capitán"
-        "jugador" -> "Jugador"
         else -> "Sin rol"
     }
 
@@ -85,7 +90,7 @@ fun DashboardScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "Bienvenido a La Cantera",
@@ -94,7 +99,7 @@ fun DashboardScreen(
             color = Color(0xFF071B4A)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = nombreMostrar,
@@ -115,23 +120,50 @@ fun DashboardScreen(
 
             Text(
                 text = message,
-                color = MaterialTheme.colorScheme.error
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedButton(
-                onClick = viewModel::loadProfile
+                onClick = viewModel::loadDashboard
             ) {
                 Text("Reintentar")
             }
         }
 
+        if (uiState.permisos.verDashboard) {
+            Spacer(modifier = Modifier.height(28.dp))
+
+            Text(
+                text = "Resumen general",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF071B4A)
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            DashboardStatsSection(
+                totalEquipos = uiState.totalEquipos,
+                totalJugadores = uiState.totalJugadores,
+                totalArbitros = uiState.totalArbitros
+            )
+        }
+
         Spacer(modifier = Modifier.height(28.dp))
 
-        if (uiState.permisos.verDashboard) {
-            DashboardOptionButton("Resumen general")
-        }
+        Text(
+            text = "Módulos disponibles",
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF071B4A)
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
 
         if (uiState.permisos.administrarDeportes) {
             DashboardOptionButton("Administrar deportes")
@@ -223,12 +255,86 @@ fun DashboardScreen(
 }
 
 @Composable
+private fun DashboardStatsSection(
+    totalEquipos: Int,
+    totalJugadores: Int,
+    totalArbitros: Int
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        DashboardStatCard(
+            title = "Equipos",
+            value = totalEquipos,
+            modifier = Modifier.weight(1f)
+        )
+
+        DashboardStatCard(
+            title = "Jugadores",
+            value = totalJugadores,
+            modifier = Modifier.weight(1f)
+        )
+
+        DashboardStatCard(
+            title = "Árbitros",
+            value = totalArbitros,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun DashboardStatCard(
+    title: String,
+    value: Int,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 10.dp,
+                    vertical = 16.dp
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = value.toString(),
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF071B4A)
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = title,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 private fun DashboardOptionButton(
     title: String
 ) {
     Button(
         onClick = {
-            // Agregaremos navegación en los siguientes pasos.
+            // Aquí agregaremos navegación a cada módulo.
         },
         modifier = Modifier
             .fillMaxWidth()
