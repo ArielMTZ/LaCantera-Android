@@ -1,5 +1,6 @@
 package com.example.lacantera.data.remote
 
+import com.example.lacantera.data.model.DashboardResponse
 import com.example.lacantera.data.model.LoginRequest
 import com.example.lacantera.data.model.LoginResponse
 import com.example.lacantera.data.model.ProfileResponse
@@ -22,6 +23,8 @@ interface ApiService {
         @Body request: TokenRefreshRequest
     ): Response<TokenRefreshResponse>
 
+    @GET("api/dashboard/")
+    suspend fun getDashboard(): Response<DashboardResponse>
     @GET("api/profile/")
     suspend fun getProfile(): Response<ProfileResponse>
 }

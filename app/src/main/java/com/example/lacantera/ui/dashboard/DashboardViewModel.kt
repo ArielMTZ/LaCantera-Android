@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lacantera.data.local.SessionManager
 import com.example.lacantera.data.model.UserPermissions
-import com.example.lacantera.data.repository.ProfileRepository
+import com.example.lacantera.data.repository.DashboardRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,20 +20,22 @@ class DashboardViewModel(
         context = application.applicationContext
     )
 
-    private val profileRepository = ProfileRepository(
+    private val dashboardRepository = DashboardRepository(
         context = application.applicationContext
     )
 
-    private val _uiState = MutableStateFlow(DashboardUiState())
+    private val _uiState = MutableStateFlow(
+        DashboardUiState()
+    )
 
     val uiState: StateFlow<DashboardUiState> =
         _uiState.asStateFlow()
 
     init {
-        loadProfile()
+        loadDashboard()
     }
 
-    fun loadProfile() {
+    fun loadDashboard() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
@@ -41,69 +43,100 @@ class DashboardViewModel(
             )
 
             try {
-                val response = profileRepository.getProfile()
+                val response =
+                    dashboardRepository.getDashboard()
 
                 if (response.isSuccessful) {
-                    val profile = response.body()
+                    val dashboard = response.body()
 
-                    if (profile != null) {
+                    if (dashboard == null) {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            userId = profile.id,
-                            username = profile.username,
-                            nombreCorto = profile.nombreCorto,
-                            rol = profile.rol,
-                            tipoUsuario = profile.tipoUsuario,
-                            isStaff = profile.isStaff,
-                            isSuperuser = profile.isSuperuser,
-                            isCapitan = profile.isCapitan,
-                            fotoUrl = profile.fotoUrl,
-                            permisos = profile.permisos,
-                            errorMessage = null
+                            errorMessage =
+                                "El servidor respondió sin datos del dashboard."
                         )
-                    } else {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            errorMessage = "El servidor respondió sin perfil."
-                        )
+
+                        return@launch
                     }
+
+                    val profile = dashboard.usuario
+                    val stats = dashboard.estadisticas
+
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+
+                        userId = profile.id,
+                        username = profile.username,
+                        nombreCorto = profile.nombreCorto,
+                        rol = profile.rol,
+                        tipoUsuario = profile.tipoUsuario,
+
+                        isStaff = profile.isStaff,
+                        isSuperuser = profile.isSuperuser,
+                        isCapitan = profile.isCapitan,
+
+                        fotoUrl = profile.fotoUrl,
+                        permisos = profile.permisos,
+
+                        totalEquipos = stats.equipos,
+                        totalJugadores = stats.jugadores,
+                        totalArbitros = stats.arbitros,
+
+                        errorMessage = null,
+                        sessionExpired = false
+                    )
                 } else {
-                    when (response.code()) {
-                        401 -> {
-                            sessionManager.clearSession()
-
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                sessionExpired = true,
-                                errorMessage = "La sesión expiró."
-                            )
-                        }
-
-                        403 -> {
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                errorMessage = "No tienes permiso para consultar el perfil."
-                            )
-                        }
-
-                        else -> {
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                errorMessage = "Error ${response.code()} al cargar el perfil."
-                            )
-                        }
-                    }
+                    handleErrorResponse(
+                        responseCode = response.code()
+                    )
                 }
             } catch (exception: IOException) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = "Error de conexión: ${exception.message}"
+                    errorMessage =
+                        "Error de conexión: ${exception.message}"
                 )
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = exception.message
-                        ?: "Ocurrió un error al cargar el perfil."
+                        ?: "Ocurrió un error al cargar el dashboard."
+                )
+            }
+        }
+    }
+
+    private suspend fun handleErrorResponse(
+        responseCode: Int
+    ) {
+        when (responseCode) {
+            401 -> {
+                /*
+                 * TokenAuthenticator ya intentó renovar el access token.
+                 * Si todavía recibimos 401, la sesión ya no es válida.
+                 */
+                sessionManager.clearSession()
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    sessionExpired = true,
+                    errorMessage = "La sesión expiró."
+                )
+            }
+
+            403 -> {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage =
+                        "No tienes permiso para consultar el dashboard."
+                )
+            }
+
+            else -> {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage =
+                        "Error $responseCode al cargar el dashboard."
                 )
             }
         }
@@ -148,6 +181,10 @@ data class DashboardUiState(
     val fotoUrl: String? = null,
 
     val permisos: UserPermissions = UserPermissions(),
+
+    val totalEquipos: Int = 0,
+    val totalJugadores: Int = 0,
+    val totalArbitros: Int = 0,
 
     val errorMessage: String? = null,
 
