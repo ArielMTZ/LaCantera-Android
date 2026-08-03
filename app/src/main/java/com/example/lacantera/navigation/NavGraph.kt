@@ -24,6 +24,7 @@ import com.example.lacantera.ui.matchdays.MatchdaysScreen
 import com.example.lacantera.ui.publichome.PublicHomeScreen
 import com.example.lacantera.ui.rules.RulesScreen
 import com.example.lacantera.ui.splash.SplashScreen
+import com.example.lacantera.ui.sports.SportsScreen
 import com.example.lacantera.ui.teams.TeamDetailScreen
 import com.example.lacantera.ui.teams.TeamsScreen
 
@@ -40,7 +41,9 @@ fun AppNavGraph() {
         composable(Routes.SPLASH) {
             SplashScreen(
                 onNavigateToPublicHome = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
                         popUpTo(Routes.SPLASH) {
                             inclusive = true
                         }
@@ -49,7 +52,9 @@ fun AppNavGraph() {
                     }
                 },
                 onNavigateToAdminDashboard = {
-                    navController.navigate(Routes.DASHBOARD) {
+                    navController.navigate(
+                        Routes.DASHBOARD
+                    ) {
                         popUpTo(Routes.SPLASH) {
                             inclusive = true
                         }
@@ -58,7 +63,9 @@ fun AppNavGraph() {
                     }
                 },
                 onNavigateToRefereeDashboard = {
-                    navController.navigate(Routes.DASHBOARD_REFEREE) {
+                    navController.navigate(
+                        Routes.DASHBOARD_REFEREE
+                    ) {
                         popUpTo(Routes.SPLASH) {
                             inclusive = true
                         }
@@ -67,7 +74,9 @@ fun AppNavGraph() {
                     }
                 },
                 onNavigateToCaptainDashboard = {
-                    navController.navigate(Routes.DASHBOARD_CAPTAIN) {
+                    navController.navigate(
+                        Routes.DASHBOARD_CAPTAIN
+                    ) {
                         popUpTo(Routes.SPLASH) {
                             inclusive = true
                         }
@@ -81,22 +90,34 @@ fun AppNavGraph() {
         composable(Routes.PUBLIC_HOME) {
             PublicHomeScreen(
                 onLoginClick = {
-                    navController.navigate(Routes.LOGIN)
+                    navController.navigate(
+                        Routes.LOGIN
+                    )
                 },
                 onProgramsClick = {
-                    navController.navigate(Routes.PROGRAMS)
+                    navController.navigate(
+                        Routes.PROGRAMS
+                    )
                 },
                 onRulesClick = {
-                    navController.navigate(Routes.RULES)
+                    navController.navigate(
+                        Routes.RULES
+                    )
                 },
                 onPrivacyClick = {
-                    navController.navigate(Routes.PRIVACY)
+                    navController.navigate(
+                        Routes.PRIVACY
+                    )
                 },
                 onTermsClick = {
-                    navController.navigate(Routes.TERMS)
+                    navController.navigate(
+                        Routes.TERMS
+                    )
                 },
                 onSupportClick = {
-                    navController.navigate(Routes.SUPPORT)
+                    navController.navigate(
+                        Routes.SUPPORT
+                    )
                 },
                 onStandingsClick = {
                     // Posiciones
@@ -105,7 +126,9 @@ fun AppNavGraph() {
                     // Equipos públicos
                 },
                 onRolesClick = {
-                    navController.navigate(Routes.MATCHDAYS) {
+                    navController.navigate(
+                        Routes.MATCHDAYS
+                    ) {
                         launchSingleTop = true
                     }
                 }
@@ -116,22 +139,27 @@ fun AppNavGraph() {
             LoginScreen(
                 onLoginSuccess = { dashboardType ->
 
-                    val destination = when (dashboardType) {
-                        DashboardType.ADMIN -> {
-                            Routes.DASHBOARD
+                    val destination =
+                        when (dashboardType) {
+                            DashboardType.ADMIN -> {
+                                Routes.DASHBOARD
+                            }
+
+                            DashboardType.REFEREE -> {
+                                Routes.DASHBOARD_REFEREE
+                            }
+
+                            DashboardType.CAPTAIN -> {
+                                Routes.DASHBOARD_CAPTAIN
+                            }
                         }
 
-                        DashboardType.REFEREE -> {
-                            Routes.DASHBOARD_REFEREE
-                        }
-
-                        DashboardType.CAPTAIN -> {
-                            Routes.DASHBOARD_CAPTAIN
-                        }
-                    }
-
-                    navController.navigate(destination) {
-                        popUpTo(Routes.PUBLIC_HOME) {
+                    navController.navigate(
+                        destination
+                    ) {
+                        popUpTo(
+                            Routes.PUBLIC_HOME
+                        ) {
                             inclusive = true
                         }
 
@@ -142,7 +170,7 @@ fun AppNavGraph() {
                     navController.popBackStack()
                 },
                 onForgotPasswordClick = {
-                    // Recuperación de contraseña
+                    // Recuperación
                 }
             )
         }
@@ -150,7 +178,9 @@ fun AppNavGraph() {
         composable(Routes.DASHBOARD) {
             DashboardScreen(
                 onLogout = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
                         popUpTo(Routes.DASHBOARD) {
                             inclusive = true
                         }
@@ -159,7 +189,9 @@ fun AppNavGraph() {
                     }
                 },
                 onSessionExpired = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
                         popUpTo(Routes.DASHBOARD) {
                             inclusive = true
                         }
@@ -167,19 +199,34 @@ fun AppNavGraph() {
                         launchSingleTop = true
                     }
                 },
+                onNavigateToSports = {
+                    navController.navigate(
+                        Routes.SPORTS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
                 onNavigateToTeams = {
-                    navController.navigate(Routes.TEAMS) {
+                    navController.navigate(
+                        Routes.TEAMS
+                    ) {
                         launchSingleTop = true
                     }
                 }
             )
         }
 
-        composable(Routes.DASHBOARD_REFEREE) {
+        composable(
+            Routes.DASHBOARD_REFEREE
+        ) {
             DashboardScreen(
                 onLogout = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
-                        popUpTo(Routes.DASHBOARD_REFEREE) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.DASHBOARD_REFEREE
+                        ) {
                             inclusive = true
                         }
 
@@ -187,27 +234,46 @@ fun AppNavGraph() {
                     }
                 },
                 onSessionExpired = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
-                        popUpTo(Routes.DASHBOARD_REFEREE) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.DASHBOARD_REFEREE
+                        ) {
                             inclusive = true
                         }
 
                         launchSingleTop = true
                     }
                 },
+                onNavigateToSports = {
+                    navController.navigate(
+                        Routes.SPORTS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
                 onNavigateToTeams = {
-                    navController.navigate(Routes.TEAMS) {
+                    navController.navigate(
+                        Routes.TEAMS
+                    ) {
                         launchSingleTop = true
                     }
                 }
             )
         }
 
-        composable(Routes.DASHBOARD_CAPTAIN) {
+        composable(
+            Routes.DASHBOARD_CAPTAIN
+        ) {
             DashboardScreen(
                 onLogout = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
-                        popUpTo(Routes.DASHBOARD_CAPTAIN) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.DASHBOARD_CAPTAIN
+                        ) {
                             inclusive = true
                         }
 
@@ -215,23 +281,57 @@ fun AppNavGraph() {
                     }
                 },
                 onSessionExpired = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
-                        popUpTo(Routes.DASHBOARD_CAPTAIN) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.DASHBOARD_CAPTAIN
+                        ) {
                             inclusive = true
                         }
 
                         launchSingleTop = true
                     }
                 },
+                onNavigateToSports = {
+                    navController.navigate(
+                        Routes.SPORTS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
                 onNavigateToTeams = {
-                    navController.navigate(Routes.TEAMS) {
+                    navController.navigate(
+                        Routes.TEAMS
+                    ) {
                         launchSingleTop = true
                     }
                 }
             )
         }
 
-        composable(Routes.TEAMS) { backStackEntry ->
+        composable(Routes.SPORTS) {
+            SportsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(Routes.SPORTS) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            Routes.TEAMS
+        ) { backStackEntry ->
 
             val refreshTeams by backStackEntry
                 .savedStateHandle
@@ -252,12 +352,15 @@ fun AppNavGraph() {
                 },
                 refreshRequested = refreshTeams,
                 onRefreshConsumed = {
-                    backStackEntry.savedStateHandle[
+                    backStackEntry
+                        .savedStateHandle[
                         "refresh_teams"
                     ] = false
                 },
                 onSessionExpired = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
                         popUpTo(Routes.TEAMS) {
                             inclusive = true
                         }
@@ -277,7 +380,8 @@ fun AppNavGraph() {
             )
         ) { backStackEntry ->
 
-            val teamId = backStackEntry.arguments
+            val teamId = backStackEntry
+                .arguments
                 ?.getInt("teamId")
                 ?: return@composable
 
@@ -287,7 +391,8 @@ fun AppNavGraph() {
                     navController.popBackStack()
                 },
                 onUpdateCompleted = {
-                    navController.previousBackStackEntry
+                    navController
+                        .previousBackStackEntry
                         ?.savedStateHandle
                         ?.set(
                             "refresh_teams",
@@ -297,8 +402,12 @@ fun AppNavGraph() {
                     navController.popBackStack()
                 },
                 onSessionExpired = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
-                        popUpTo(Routes.TEAM_DETAIL) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.TEAM_DETAIL
+                        ) {
                             inclusive = true
                         }
 
@@ -311,7 +420,10 @@ fun AppNavGraph() {
         composable(Routes.PROGRAMS) {
             PublicInformationScreen(
                 title = "Programas",
-                message = "Aquí mostraremos los programas y deportes disponibles.",
+                message = (
+                        "Aquí mostraremos los programas " +
+                                "y deportes disponibles."
+                        ),
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -329,7 +441,10 @@ fun AppNavGraph() {
         composable(Routes.PRIVACY) {
             PublicInformationScreen(
                 title = "Aviso de privacidad",
-                message = "Aquí mostraremos el aviso de privacidad.",
+                message = (
+                        "Aquí mostraremos el aviso " +
+                                "de privacidad."
+                        ),
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -339,7 +454,10 @@ fun AppNavGraph() {
         composable(Routes.TERMS) {
             PublicInformationScreen(
                 title = "Términos y condiciones",
-                message = "Aquí mostraremos los términos y condiciones.",
+                message = (
+                        "Aquí mostraremos los términos " +
+                                "y condiciones."
+                        ),
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -349,7 +467,10 @@ fun AppNavGraph() {
         composable(Routes.SUPPORT) {
             PublicInformationScreen(
                 title = "Soporte",
-                message = "Aquí mostraremos la información de contacto y soporte.",
+                message = (
+                        "Aquí mostraremos la información " +
+                                "de contacto y soporte."
+                        ),
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -359,8 +480,12 @@ fun AppNavGraph() {
         composable(Routes.MATCHDAYS) {
             MatchdaysScreen(
                 onHomeClick = {
-                    navController.navigate(Routes.PUBLIC_HOME) {
-                        popUpTo(Routes.PUBLIC_HOME) {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.PUBLIC_HOME
+                        ) {
                             inclusive = false
                         }
 
@@ -369,13 +494,19 @@ fun AppNavGraph() {
                 },
                 onRolesClick = {},
                 onLoginClick = {
-                    navController.navigate(Routes.LOGIN)
+                    navController.navigate(
+                        Routes.LOGIN
+                    )
                 },
                 onPrivacyClick = {
-                    navController.navigate(Routes.PRIVACY)
+                    navController.navigate(
+                        Routes.PRIVACY
+                    )
                 },
                 onTermsClick = {
-                    navController.navigate(Routes.TERMS)
+                    navController.navigate(
+                        Routes.TERMS
+                    )
                 }
             )
         }
@@ -392,8 +523,10 @@ private fun PublicInformationScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment =
+            Alignment.CenterHorizontally,
+        verticalArrangement =
+            Arrangement.Center
     ) {
         Text(
             text = title

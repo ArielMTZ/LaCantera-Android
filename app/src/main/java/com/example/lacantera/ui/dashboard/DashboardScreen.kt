@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun DashboardScreen(
     onLogout: () -> Unit,
     onSessionExpired: () -> Unit,
+    onNavigateToSports: () -> Unit,
     onNavigateToTeams: () -> Unit,
     viewModel: DashboardViewModel = viewModel()
 ) {
@@ -71,7 +72,9 @@ fun DashboardScreen(
         uiState.username
     }
 
-    val nombreRol = when (uiState.tipoUsuario.lowercase()) {
+    val nombreRol = when (
+        uiState.tipoUsuario.lowercase()
+    ) {
         "superadmin" -> "Superadministrador"
         "staff" -> "Staff"
         "admin_principal" -> "Administrador principal"
@@ -86,12 +89,16 @@ fun DashboardScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF4F6FA))
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(
+                rememberScrollState()
+            )
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
 
         Text(
             text = "Bienvenido a La Cantera",
@@ -100,7 +107,9 @@ fun DashboardScreen(
             color = Color(0xFF071B4A)
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
 
         Text(
             text = nombreMostrar,
@@ -108,16 +117,22 @@ fun DashboardScreen(
             fontWeight = FontWeight.SemiBold
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(
+            modifier = Modifier.height(6.dp)
+        )
 
         Text(
             text = "Tipo de usuario: $nombreRol",
             fontSize = 15.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme
+                .colorScheme
+                .onSurfaceVariant
         )
 
         uiState.errorMessage?.let { message ->
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
 
             Text(
                 text = message,
@@ -125,7 +140,9 @@ fun DashboardScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
 
             OutlinedButton(
                 onClick = viewModel::loadDashboard
@@ -135,7 +152,9 @@ fun DashboardScreen(
         }
 
         if (uiState.permisos.verDashboard) {
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(
+                modifier = Modifier.height(28.dp)
+            )
 
             Text(
                 text = "Resumen general",
@@ -145,7 +164,9 @@ fun DashboardScreen(
                 color = Color(0xFF071B4A)
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(
+                modifier = Modifier.height(14.dp)
+            )
 
             DashboardStatsSection(
                 totalEquipos = uiState.totalEquipos,
@@ -154,7 +175,9 @@ fun DashboardScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(
+            modifier = Modifier.height(28.dp)
+        )
 
         Text(
             text = "Módulos disponibles",
@@ -164,88 +187,170 @@ fun DashboardScreen(
             color = Color(0xFF071B4A)
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(
+            modifier = Modifier.height(14.dp)
+        )
 
-        if (uiState.permisos.administrarDeportes) {
-            DashboardOptionButton("Administrar deportes")
+        if (
+            uiState.permisos.administrarDeportes
+        ) {
+            DashboardOptionButton(
+                title = "Administrar deportes",
+                onClick = onNavigateToSports
+            )
         }
 
-        if (uiState.permisos.administrarEquipos) {
+        if (
+            uiState.permisos.administrarEquipos
+        ) {
             DashboardOptionButton(
                 title = "Administrar equipos",
                 onClick = onNavigateToTeams
             )
         }
 
-        if (uiState.permisos.administrarUsuarios) {
-            DashboardOptionButton("Administrar usuarios")
+        if (
+            uiState.permisos.administrarUsuarios
+        ) {
+            DashboardOptionButton(
+                title = "Administrar usuarios"
+            )
         }
 
-        if (uiState.permisos.verTemporadaActual) {
-            DashboardOptionButton("Temporada actual")
+        if (
+            uiState.permisos.verTemporadaActual
+        ) {
+            DashboardOptionButton(
+                title = "Temporada actual"
+            )
         }
 
-        if (uiState.permisos.verHistorialTemporadas) {
-            DashboardOptionButton("Historial de temporadas")
+        if (
+            uiState.permisos.verHistorialTemporadas
+        ) {
+            DashboardOptionButton(
+                title = "Historial de temporadas"
+            )
         }
 
-        if (uiState.permisos.verInscripciones) {
-            DashboardOptionButton("Inscripciones")
+        if (
+            uiState.permisos.verInscripciones
+        ) {
+            DashboardOptionButton(
+                title = "Inscripciones"
+            )
         }
 
-        if (uiState.permisos.verArbitrajes) {
-            DashboardOptionButton("Arbitrajes")
+        if (
+            uiState.permisos.verArbitrajes
+        ) {
+            DashboardOptionButton(
+                title = "Arbitrajes"
+            )
         }
 
-        if (uiState.permisos.verHistorialInscripciones) {
-            DashboardOptionButton("Historial de inscripciones")
+        if (
+            uiState.permisos.verHistorialInscripciones
+        ) {
+            DashboardOptionButton(
+                title = "Historial de inscripciones"
+            )
         }
 
-        if (uiState.permisos.verMisPartidos) {
-            DashboardOptionButton("Mis partidos")
+        if (
+            uiState.permisos.verMisPartidos
+        ) {
+            DashboardOptionButton(
+                title = "Mis partidos"
+            )
         }
 
-        if (uiState.permisos.verHistorialPartidos) {
-            DashboardOptionButton("Historial de partidos")
+        if (
+            uiState.permisos.verHistorialPartidos
+        ) {
+            DashboardOptionButton(
+                title = "Historial de partidos"
+            )
         }
 
-        if (uiState.permisos.verPanelArbitro) {
-            DashboardOptionButton("Panel de árbitro")
+        if (
+            uiState.permisos.verPanelArbitro
+        ) {
+            DashboardOptionButton(
+                title = "Panel de árbitro"
+            )
         }
 
-        if (uiState.permisos.verMisEquipos) {
-            DashboardOptionButton("Mis equipos")
+        if (
+            uiState.permisos.verMisEquipos
+        ) {
+            DashboardOptionButton(
+                title = "Mis equipos"
+            )
         }
 
-        if (uiState.permisos.verPanelCapitan) {
-            DashboardOptionButton("Panel de capitán")
+        if (
+            uiState.permisos.verPanelCapitan
+        ) {
+            DashboardOptionButton(
+                title = "Panel de capitán"
+            )
         }
 
-        if (uiState.permisos.verHistorialJuegosCapitan) {
-            DashboardOptionButton("Historial de juegos")
+        if (
+            uiState.permisos
+                .verHistorialJuegosCapitan
+        ) {
+            DashboardOptionButton(
+                title = "Historial de juegos"
+            )
         }
 
-        if (uiState.permisos.verHistorialPagosCapitan) {
-            DashboardOptionButton("Historial de pagos")
+        if (
+            uiState.permisos
+                .verHistorialPagosCapitan
+        ) {
+            DashboardOptionButton(
+                title = "Historial de pagos"
+            )
         }
 
-        if (uiState.permisos.verEstadisticas) {
-            DashboardOptionButton("Estadísticas")
+        if (
+            uiState.permisos.verEstadisticas
+        ) {
+            DashboardOptionButton(
+                title = "Estadísticas"
+            )
         }
 
-        if (uiState.permisos.verLogs) {
-            DashboardOptionButton("Logs")
+        if (
+            uiState.permisos.verLogs
+        ) {
+            DashboardOptionButton(
+                title = "Logs"
+            )
         }
 
-        if (uiState.permisos.verUsuariosBloqueados) {
-            DashboardOptionButton("Usuarios bloqueados")
+        if (
+            uiState.permisos.verUsuariosBloqueados
+        ) {
+            DashboardOptionButton(
+                title = "Usuarios bloqueados"
+            )
         }
 
-        if (uiState.permisos.verSolicitudesRecuperacion) {
-            DashboardOptionButton("Solicitudes de recuperación")
+        if (
+            uiState.permisos
+                .verSolicitudesRecuperacion
+        ) {
+            DashboardOptionButton(
+                title = "Solicitudes de recuperación"
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
 
         OutlinedButton(
             onClick = viewModel::logout,
@@ -254,7 +359,9 @@ fun DashboardScreen(
             Text("Cerrar sesión")
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
     }
 }
 
@@ -266,7 +373,8 @@ private fun DashboardStatsSection(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement =
+            Arrangement.spacedBy(10.dp)
     ) {
         DashboardStatCard(
             title = "Equipos",
@@ -311,7 +419,8 @@ private fun DashboardStatCard(
                     horizontal = 10.dp,
                     vertical = 16.dp
                 ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment =
+                Alignment.CenterHorizontally
         ) {
             Text(
                 text = value.toString(),
@@ -320,12 +429,16 @@ private fun DashboardStatCard(
                 color = Color(0xFF071B4A)
             )
 
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(
+                modifier = Modifier.height(5.dp)
+            )
 
             Text(
                 text = title,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme
+                    .colorScheme
+                    .onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
