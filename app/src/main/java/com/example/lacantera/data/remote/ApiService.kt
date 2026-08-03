@@ -10,6 +10,21 @@ import com.example.lacantera.data.model.TeamsResponse
 import com.example.lacantera.data.model.TokenRefreshRequest
 import com.example.lacantera.data.model.TokenRefreshResponse
 import com.example.lacantera.data.model.UpdateTeamRequest
+import com.example.lacantera.data.model.ActiveSeasonsResponse
+import com.example.lacantera.data.model.CategoriesResponse
+import com.example.lacantera.data.model.MatchdaysResponse
+import com.example.lacantera.data.model.SportsResponse
+import com.example.lacantera.data.model.CategoryMutationResponse
+import com.example.lacantera.data.model.CreateCategoryRequest
+import com.example.lacantera.data.model.CreatePositionRequest
+import com.example.lacantera.data.model.CreateSportRequest
+import com.example.lacantera.data.model.DeleteResponse
+import com.example.lacantera.data.model.PositionMutationResponse
+import com.example.lacantera.data.model.SportMutationResponse
+import com.example.lacantera.data.model.UpdateCategoryRequest
+import com.example.lacantera.data.model.UpdateSportRequest
+import retrofit2.http.DELETE
+import retrofit2.http.Query
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -48,4 +63,63 @@ interface ApiService {
         @Path("teamId") teamId: Int,
         @Body request: UpdateTeamRequest
     ): Response<TeamUpdateResponse>
+
+
+    @GET("api/sports/")
+    suspend fun getSports(): Response<SportsResponse>
+
+    @GET("api/categories/")
+    suspend fun getCategories(
+        @Query("sport_id") sportId: Int? = null
+    ): Response<CategoriesResponse>
+
+    @GET("api/seasons/active/")
+    suspend fun getActiveSeasons(): Response<ActiveSeasonsResponse>
+
+    @GET("api/matchdays/")
+    suspend fun getMatchdays(): Response<MatchdaysResponse>
+
+
+    @POST("api/sports/")
+    suspend fun createSport(
+        @Body request: CreateSportRequest
+    ): Response<SportMutationResponse>
+
+    @PATCH("api/sports/{sportId}/")
+    suspend fun updateSport(
+        @Path("sportId") sportId: Int,
+        @Body request: UpdateSportRequest
+    ): Response<SportMutationResponse>
+
+    @DELETE("api/sports/{sportId}/")
+    suspend fun deleteSport(
+        @Path("sportId") sportId: Int
+    ): Response<DeleteResponse>
+
+    @POST("api/categories/")
+    suspend fun createCategory(
+        @Body request: CreateCategoryRequest
+    ): Response<CategoryMutationResponse>
+
+    @PATCH("api/categories/{categoryId}/")
+    suspend fun updateCategory(
+        @Path("categoryId") categoryId: Int,
+        @Body request: UpdateCategoryRequest
+    ): Response<CategoryMutationResponse>
+
+    @DELETE("api/categories/{categoryId}/")
+    suspend fun deleteCategory(
+        @Path("categoryId") categoryId: Int
+    ): Response<DeleteResponse>
+
+    @POST("api/sports/{sportId}/positions/")
+    suspend fun createPosition(
+        @Path("sportId") sportId: Int,
+        @Body request: CreatePositionRequest
+    ): Response<PositionMutationResponse>
+
+    @DELETE("api/positions/{positionId}/")
+    suspend fun deletePosition(
+        @Path("positionId") positionId: Int
+    ): Response<DeleteResponse>
 }
