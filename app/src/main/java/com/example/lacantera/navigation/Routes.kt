@@ -28,6 +28,17 @@ object Routes {
 
     const val SEASONS = "seasons"
 
+    const val REFEREE_MATCHES = "referee_matches"
+
+    const val REFEREE_MATCH_DETAIL =
+        "referee_match_detail/{matchId}"
+
+    fun refereeMatchDetail(
+        matchId: Int
+    ): String {
+        return "referee_match_detail/$matchId"
+    }
+
     fun teamDetail(teamId: Int): String {
         return "team_detail/$teamId"
     }

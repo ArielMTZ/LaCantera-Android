@@ -33,6 +33,8 @@ import com.example.lacantera.data.model.CreateSeasonRequest
 import com.example.lacantera.data.model.FinalizeSeasonRequest
 import com.example.lacantera.data.model.SeasonMutationResponse
 import com.example.lacantera.data.model.SeasonsResponse
+import com.example.lacantera.data.model.RefereeMatchDetailResponse
+import com.example.lacantera.data.model.RefereeMatchesResponse
 import retrofit2.http.DELETE
 import retrofit2.http.Query
 import retrofit2.Response
@@ -170,4 +172,15 @@ interface ApiService {
         @Path("seasonId") seasonId: Int,
         @Body request: FinalizeSeasonRequest
     ): Response<SeasonMutationResponse>
+
+    @GET("api/referee/matches/")
+    suspend fun getRefereeMatches(): Response<RefereeMatchesResponse>
+
+    @GET("api/referee/matches/history/")
+    suspend fun getRefereeMatchHistory(): Response<RefereeMatchesResponse>
+
+    @GET("api/referee/matches/{matchId}/")
+    suspend fun getRefereeMatchDetail(
+        @Path("matchId") matchId: Int
+    ): Response<RefereeMatchDetailResponse>
 }
