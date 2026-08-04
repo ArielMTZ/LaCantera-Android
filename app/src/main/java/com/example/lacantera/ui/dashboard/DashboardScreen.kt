@@ -41,6 +41,7 @@ fun DashboardScreen(
     onNavigateToTeams: () -> Unit,
     onNavigateToUsers: () -> Unit,
     onNavigateToSeasons: () -> Unit,
+    onNavigateToRefereeMatches: () -> Unit,
     viewModel: DashboardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -90,13 +91,17 @@ fun DashboardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF4F6FA))
+            .background(
+                Color(0xFFF4F6FA)
+            )
             .verticalScroll(
                 rememberScrollState()
             )
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        horizontalAlignment =
+            Alignment.CenterHorizontally,
+        verticalArrangement =
+            Arrangement.Top
     ) {
         Spacer(
             modifier = Modifier.height(24.dp)
@@ -138,7 +143,9 @@ fun DashboardScreen(
 
             Text(
                 text = message,
-                color = MaterialTheme.colorScheme.error,
+                color = MaterialTheme
+                    .colorScheme
+                    .error,
                 textAlign = TextAlign.Center
             )
 
@@ -172,8 +179,10 @@ fun DashboardScreen(
 
             DashboardStatsSection(
                 totalEquipos = uiState.totalEquipos,
-                totalJugadores = uiState.totalJugadores,
-                totalArbitros = uiState.totalArbitros
+                totalJugadores =
+                    uiState.totalJugadores,
+                totalArbitros =
+                    uiState.totalArbitros
             )
         }
 
@@ -194,7 +203,8 @@ fun DashboardScreen(
         )
 
         if (
-            uiState.permisos.administrarDeportes
+            uiState.permisos
+                .administrarDeportes
         ) {
             DashboardOptionButton(
                 title = "Administrar deportes",
@@ -203,7 +213,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.administrarEquipos
+            uiState.permisos
+                .administrarEquipos
         ) {
             DashboardOptionButton(
                 title = "Administrar equipos",
@@ -212,7 +223,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.administrarUsuarios
+            uiState.permisos
+                .administrarUsuarios
         ) {
             DashboardOptionButton(
                 title = "Administrar usuarios",
@@ -221,7 +233,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verTemporadaActual
+            uiState.permisos
+                .verTemporadaActual
         ) {
             DashboardOptionButton(
                 title = "Temporada actual",
@@ -230,7 +243,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verHistorialTemporadas
+            uiState.permisos
+                .verHistorialTemporadas
         ) {
             DashboardOptionButton(
                 title = "Historial de temporadas"
@@ -238,7 +252,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verInscripciones
+            uiState.permisos
+                .verInscripciones
         ) {
             DashboardOptionButton(
                 title = "Inscripciones"
@@ -246,7 +261,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verArbitrajes
+            uiState.permisos
+                .verArbitrajes
         ) {
             DashboardOptionButton(
                 title = "Arbitrajes"
@@ -254,7 +270,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verHistorialInscripciones
+            uiState.permisos
+                .verHistorialInscripciones
         ) {
             DashboardOptionButton(
                 title = "Historial de inscripciones"
@@ -262,31 +279,41 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verMisPartidos
+            uiState.permisos
+                .verMisPartidos
         ) {
             DashboardOptionButton(
-                title = "Mis partidos"
+                title = "Mis partidos",
+                onClick =
+                    onNavigateToRefereeMatches
             )
         }
 
         if (
-            uiState.permisos.verHistorialPartidos
+            uiState.permisos
+                .verHistorialPartidos
         ) {
             DashboardOptionButton(
-                title = "Historial de partidos"
+                title = "Historial de partidos",
+                onClick =
+                    onNavigateToRefereeMatches
             )
         }
 
         if (
-            uiState.permisos.verPanelArbitro
+            uiState.permisos
+                .verPanelArbitro
         ) {
             DashboardOptionButton(
-                title = "Panel de árbitro"
+                title = "Panel de árbitro",
+                onClick =
+                    onNavigateToRefereeMatches
             )
         }
 
         if (
-            uiState.permisos.verMisEquipos
+            uiState.permisos
+                .verMisEquipos
         ) {
             DashboardOptionButton(
                 title = "Mis equipos"
@@ -294,7 +321,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verPanelCapitan
+            uiState.permisos
+                .verPanelCapitan
         ) {
             DashboardOptionButton(
                 title = "Panel de capitán"
@@ -320,7 +348,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verEstadisticas
+            uiState.permisos
+                .verEstadisticas
         ) {
             DashboardOptionButton(
                 title = "Estadísticas"
@@ -328,7 +357,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verLogs
+            uiState.permisos
+                .verLogs
         ) {
             DashboardOptionButton(
                 title = "Logs"
@@ -336,7 +366,8 @@ fun DashboardScreen(
         }
 
         if (
-            uiState.permisos.verUsuariosBloqueados
+            uiState.permisos
+                .verUsuariosBloqueados
         ) {
             DashboardOptionButton(
                 title = "Usuarios bloqueados"
@@ -458,7 +489,9 @@ private fun DashboardOptionButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 10.dp)
+            .padding(
+                bottom = 10.dp
+            )
     ) {
         Text(title)
     }

@@ -22,15 +22,17 @@ import com.example.lacantera.ui.login.DashboardType
 import com.example.lacantera.ui.login.LoginScreen
 import com.example.lacantera.ui.matchdays.MatchdaysScreen
 import com.example.lacantera.ui.publichome.PublicHomeScreen
+import com.example.lacantera.ui.referee.RefereeMatchDetailScreen
+import com.example.lacantera.ui.referee.RefereeMatchesScreen
 import com.example.lacantera.ui.rules.RulesScreen
+import com.example.lacantera.ui.seasons.SeasonsScreen
 import com.example.lacantera.ui.splash.SplashScreen
 import com.example.lacantera.ui.sports.SportsScreen
 import com.example.lacantera.ui.teams.TeamDetailScreen
 import com.example.lacantera.ui.teams.TeamsScreen
+import com.example.lacantera.ui.users.CreateUserScreen
 import com.example.lacantera.ui.users.UserDetailScreen
 import com.example.lacantera.ui.users.UsersScreen
-import com.example.lacantera.ui.users.CreateUserScreen
-import com.example.lacantera.ui.seasons.SeasonsScreen
 
 @Composable
 fun AppNavGraph() {
@@ -65,7 +67,6 @@ fun AppNavGraph() {
 
                         launchSingleTop = true
                     }
-
                 },
                 onNavigateToRefereeDashboard = {
                     navController.navigate(
@@ -144,20 +145,21 @@ fun AppNavGraph() {
             LoginScreen(
                 onLoginSuccess = { dashboardType ->
 
-                    val destination =
-                        when (dashboardType) {
-                            DashboardType.ADMIN -> {
-                                Routes.DASHBOARD
-                            }
-
-                            DashboardType.REFEREE -> {
-                                Routes.DASHBOARD_REFEREE
-                            }
-
-                            DashboardType.CAPTAIN -> {
-                                Routes.DASHBOARD_CAPTAIN
-                            }
+                    val destination = when (
+                        dashboardType
+                    ) {
+                        DashboardType.ADMIN -> {
+                            Routes.DASHBOARD
                         }
+
+                        DashboardType.REFEREE -> {
+                            Routes.DASHBOARD_REFEREE
+                        }
+
+                        DashboardType.CAPTAIN -> {
+                            Routes.DASHBOARD_CAPTAIN
+                        }
+                    }
 
                     navController.navigate(
                         destination
@@ -186,7 +188,9 @@ fun AppNavGraph() {
                     navController.navigate(
                         Routes.PUBLIC_HOME
                     ) {
-                        popUpTo(Routes.DASHBOARD) {
+                        popUpTo(
+                            Routes.DASHBOARD
+                        ) {
                             inclusive = true
                         }
 
@@ -197,7 +201,9 @@ fun AppNavGraph() {
                     navController.navigate(
                         Routes.PUBLIC_HOME
                     ) {
-                        popUpTo(Routes.DASHBOARD) {
+                        popUpTo(
+                            Routes.DASHBOARD
+                        ) {
                             inclusive = true
                         }
 
@@ -228,6 +234,13 @@ fun AppNavGraph() {
                 onNavigateToSeasons = {
                     navController.navigate(
                         Routes.SEASONS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToRefereeMatches = {
+                    navController.navigate(
+                        Routes.REFEREE_MATCHES
                     ) {
                         launchSingleTop = true
                     }
@@ -279,7 +292,6 @@ fun AppNavGraph() {
                         launchSingleTop = true
                     }
                 },
-
                 onNavigateToUsers = {
                     navController.navigate(
                         Routes.USERS
@@ -290,6 +302,13 @@ fun AppNavGraph() {
                 onNavigateToSeasons = {
                     navController.navigate(
                         Routes.SEASONS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToRefereeMatches = {
+                    navController.navigate(
+                        Routes.REFEREE_MATCHES
                     ) {
                         launchSingleTop = true
                     }
@@ -354,6 +373,80 @@ fun AppNavGraph() {
                     ) {
                         launchSingleTop = true
                     }
+                },
+                onNavigateToRefereeMatches = {
+                    navController.navigate(
+                        Routes.REFEREE_MATCHES
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            Routes.REFEREE_MATCHES
+        ) {
+            RefereeMatchesScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onMatchClick = { matchId ->
+                    navController.navigate(
+                        Routes.refereeMatchDetail(
+                            matchId
+                        )
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.REFEREE_MATCHES
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = Routes.REFEREE_MATCH_DETAIL,
+            arguments = listOf(
+                navArgument("matchId") {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+
+            val matchId = backStackEntry
+                .arguments
+                ?.getInt("matchId")
+                ?: return@composable
+
+            RefereeMatchDetailScreen(
+                matchId = matchId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.REFEREE_MATCHES
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -367,7 +460,9 @@ fun AppNavGraph() {
                     navController.navigate(
                         Routes.PUBLIC_HOME
                     ) {
-                        popUpTo(Routes.SPORTS) {
+                        popUpTo(
+                            Routes.SPORTS
+                        ) {
                             inclusive = true
                         }
 
@@ -395,7 +490,9 @@ fun AppNavGraph() {
                 },
                 onTeamClick = { teamId ->
                     navController.navigate(
-                        Routes.teamDetail(teamId)
+                        Routes.teamDetail(
+                            teamId
+                        )
                     )
                 },
                 refreshRequested = refreshTeams,
@@ -409,7 +506,9 @@ fun AppNavGraph() {
                     navController.navigate(
                         Routes.PUBLIC_HOME
                     ) {
-                        popUpTo(Routes.TEAMS) {
+                        popUpTo(
+                            Routes.TEAMS
+                        ) {
                             inclusive = true
                         }
 
@@ -483,7 +582,9 @@ fun AppNavGraph() {
                 },
                 onUserClick = { userId ->
                     navController.navigate(
-                        Routes.userDetail(userId)
+                        Routes.userDetail(
+                            userId
+                        )
                     )
                 },
                 refreshRequested = refreshUsers,
@@ -497,7 +598,9 @@ fun AppNavGraph() {
                     navController.navigate(
                         Routes.PUBLIC_HOME
                     ) {
-                        popUpTo(Routes.USERS) {
+                        popUpTo(
+                            Routes.USERS
+                        ) {
                             inclusive = true
                         }
 
@@ -508,7 +611,7 @@ fun AppNavGraph() {
                     navController.navigate(
                         Routes.USER_CREATE
                     )
-                },
+                }
             )
         }
 
