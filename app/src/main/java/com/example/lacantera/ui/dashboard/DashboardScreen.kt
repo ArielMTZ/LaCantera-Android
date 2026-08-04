@@ -39,6 +39,7 @@ fun DashboardScreen(
     onSessionExpired: () -> Unit,
     onNavigateToSports: () -> Unit,
     onNavigateToTeams: () -> Unit,
+    onNavigateToUsers: () -> Unit,
     viewModel: DashboardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -213,7 +214,8 @@ fun DashboardScreen(
             uiState.permisos.administrarUsuarios
         ) {
             DashboardOptionButton(
-                title = "Administrar usuarios"
+                title = "Administrar usuarios",
+                onClick = onNavigateToUsers
             )
         }
 

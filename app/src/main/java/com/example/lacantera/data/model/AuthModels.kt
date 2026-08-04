@@ -62,5 +62,8 @@ data class Usuario(
     @SerializedName("tipo_usuario")
     val tipoUsuario: String = "sin_rol",
 
+    @SerializedName("is_active")
+    val isActive: Boolean = true,
+
     val permisos: UserPermissions = UserPermissions()
 )
