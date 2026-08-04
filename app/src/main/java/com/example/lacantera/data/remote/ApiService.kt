@@ -29,6 +29,10 @@ import com.example.lacantera.data.model.UpdateUserResponse
 import com.example.lacantera.data.model.Usuario
 import com.example.lacantera.data.model.CreateUserRequest
 import com.example.lacantera.data.model.CreateUserResponse
+import com.example.lacantera.data.model.CreateSeasonRequest
+import com.example.lacantera.data.model.FinalizeSeasonRequest
+import com.example.lacantera.data.model.SeasonMutationResponse
+import com.example.lacantera.data.model.SeasonsResponse
 import retrofit2.http.DELETE
 import retrofit2.http.Query
 import retrofit2.Response
@@ -152,4 +156,18 @@ interface ApiService {
     suspend fun createUser(
         @Body request: CreateUserRequest
     ): Response<CreateUserResponse>
+
+    @GET("api/seasons/")
+    suspend fun getSeasons(): Response<SeasonsResponse>
+
+    @POST("api/seasons/")
+    suspend fun createSeason(
+        @Body request: CreateSeasonRequest
+    ): Response<SeasonMutationResponse>
+
+    @PATCH("api/seasons/{seasonId}/")
+    suspend fun finalizeSeason(
+        @Path("seasonId") seasonId: Int,
+        @Body request: FinalizeSeasonRequest
+    ): Response<SeasonMutationResponse>
 }

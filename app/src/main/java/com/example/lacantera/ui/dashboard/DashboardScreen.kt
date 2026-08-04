@@ -40,6 +40,7 @@ fun DashboardScreen(
     onNavigateToSports: () -> Unit,
     onNavigateToTeams: () -> Unit,
     onNavigateToUsers: () -> Unit,
+    onNavigateToSeasons: () -> Unit,
     viewModel: DashboardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -223,7 +224,8 @@ fun DashboardScreen(
             uiState.permisos.verTemporadaActual
         ) {
             DashboardOptionButton(
-                title = "Temporada actual"
+                title = "Temporada actual",
+                onClick = onNavigateToSeasons
             )
         }
 

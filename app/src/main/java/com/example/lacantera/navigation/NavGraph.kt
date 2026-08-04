@@ -30,6 +30,7 @@ import com.example.lacantera.ui.teams.TeamsScreen
 import com.example.lacantera.ui.users.UserDetailScreen
 import com.example.lacantera.ui.users.UsersScreen
 import com.example.lacantera.ui.users.CreateUserScreen
+import com.example.lacantera.ui.seasons.SeasonsScreen
 
 @Composable
 fun AppNavGraph() {
@@ -223,6 +224,13 @@ fun AppNavGraph() {
                     ) {
                         launchSingleTop = true
                     }
+                },
+                onNavigateToSeasons = {
+                    navController.navigate(
+                        Routes.SEASONS
+                    ) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -278,6 +286,13 @@ fun AppNavGraph() {
                     ) {
                         launchSingleTop = true
                     }
+                },
+                onNavigateToSeasons = {
+                    navController.navigate(
+                        Routes.SEASONS
+                    ) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -329,6 +344,13 @@ fun AppNavGraph() {
                 onNavigateToUsers = {
                     navController.navigate(
                         Routes.USERS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToSeasons = {
+                    navController.navigate(
+                        Routes.SEASONS
                     ) {
                         launchSingleTop = true
                     }
@@ -560,6 +582,29 @@ fun AppNavGraph() {
                     ) {
                         popUpTo(
                             Routes.USER_CREATE
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            Routes.SEASONS
+        ) {
+            SeasonsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.SEASONS
                         ) {
                             inclusive = true
                         }
