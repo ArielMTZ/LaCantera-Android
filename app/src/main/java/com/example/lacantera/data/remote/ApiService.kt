@@ -23,6 +23,12 @@ import com.example.lacantera.data.model.PositionMutationResponse
 import com.example.lacantera.data.model.SportMutationResponse
 import com.example.lacantera.data.model.UpdateCategoryRequest
 import com.example.lacantera.data.model.UpdateSportRequest
+import com.example.lacantera.data.model.PaginatedUsersResponse
+import com.example.lacantera.data.model.UpdateUserRequest
+import com.example.lacantera.data.model.UpdateUserResponse
+import com.example.lacantera.data.model.Usuario
+import com.example.lacantera.data.model.CreateUserRequest
+import com.example.lacantera.data.model.CreateUserResponse
 import retrofit2.http.DELETE
 import retrofit2.http.Query
 import retrofit2.Response
@@ -122,4 +128,28 @@ interface ApiService {
     suspend fun deletePosition(
         @Path("positionId") positionId: Int
     ): Response<DeleteResponse>
+
+    @GET("api/users/")
+    suspend fun getUsers(
+        @Query("page") page: Int = 1,
+        @Query("search") search: String? = null,
+        @Query("rol") rol: String? = null,
+        @Query("estado") estado: String? = null
+    ): Response<PaginatedUsersResponse>
+
+    @GET("api/users/{userId}/")
+    suspend fun getUserDetail(
+        @Path("userId") userId: Int
+    ): Response<Usuario>
+
+    @PATCH("api/users/{userId}/")
+    suspend fun updateUser(
+        @Path("userId") userId: Int,
+        @Body request: UpdateUserRequest
+    ): Response<UpdateUserResponse>
+
+    @POST("api/users/")
+    suspend fun createUser(
+        @Body request: CreateUserRequest
+    ): Response<CreateUserResponse>
 }

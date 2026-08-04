@@ -27,6 +27,9 @@ import com.example.lacantera.ui.splash.SplashScreen
 import com.example.lacantera.ui.sports.SportsScreen
 import com.example.lacantera.ui.teams.TeamDetailScreen
 import com.example.lacantera.ui.teams.TeamsScreen
+import com.example.lacantera.ui.users.UserDetailScreen
+import com.example.lacantera.ui.users.UsersScreen
+import com.example.lacantera.ui.users.CreateUserScreen
 
 @Composable
 fun AppNavGraph() {
@@ -61,6 +64,7 @@ fun AppNavGraph() {
 
                         launchSingleTop = true
                     }
+
                 },
                 onNavigateToRefereeDashboard = {
                     navController.navigate(
@@ -212,6 +216,13 @@ fun AppNavGraph() {
                     ) {
                         launchSingleTop = true
                     }
+                },
+                onNavigateToUsers = {
+                    navController.navigate(
+                        Routes.USERS
+                    ) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -259,6 +270,14 @@ fun AppNavGraph() {
                     ) {
                         launchSingleTop = true
                     }
+                },
+
+                onNavigateToUsers = {
+                    navController.navigate(
+                        Routes.USERS
+                    ) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -303,6 +322,13 @@ fun AppNavGraph() {
                 onNavigateToTeams = {
                     navController.navigate(
                         Routes.TEAMS
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToUsers = {
+                    navController.navigate(
+                        Routes.USERS
                     ) {
                         launchSingleTop = true
                     }
@@ -407,6 +433,133 @@ fun AppNavGraph() {
                     ) {
                         popUpTo(
                             Routes.TEAM_DETAIL
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            Routes.USERS
+        ) { backStackEntry ->
+
+            val refreshUsers by backStackEntry
+                .savedStateHandle
+                .getStateFlow(
+                    key = "refresh_users",
+                    initialValue = false
+                )
+                .collectAsState()
+
+            UsersScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onUserClick = { userId ->
+                    navController.navigate(
+                        Routes.userDetail(userId)
+                    )
+                },
+                refreshRequested = refreshUsers,
+                onRefreshConsumed = {
+                    backStackEntry
+                        .savedStateHandle[
+                        "refresh_users"
+                    ] = false
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(Routes.USERS) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                },
+                onCreateUserClick = {
+                    navController.navigate(
+                        Routes.USER_CREATE
+                    )
+                },
+            )
+        }
+
+        composable(
+            route = Routes.USER_DETAIL,
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+
+            val userId = backStackEntry
+                .arguments
+                ?.getInt("userId")
+                ?: return@composable
+
+            UserDetailScreen(
+                userId = userId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onUpdateCompleted = {
+                    navController
+                        .previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "refresh_users",
+                            true
+                        )
+
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.USER_DETAIL
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(
+            Routes.USER_CREATE
+        ) {
+            CreateUserScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCreateCompleted = {
+                    navController
+                        .previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "refresh_users",
+                            true
+                        )
+
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.USER_CREATE
                         ) {
                             inclusive = true
                         }
