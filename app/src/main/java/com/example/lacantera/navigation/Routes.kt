@@ -26,6 +26,8 @@ object Routes {
     const val USER_DETAIL = "user_detail/{userId}"
     const val USER_CREATE = "user_create"
 
+    const val SEASONS = "seasons"
+
     fun teamDetail(teamId: Int): String {
         return "team_detail/$teamId"
     }
