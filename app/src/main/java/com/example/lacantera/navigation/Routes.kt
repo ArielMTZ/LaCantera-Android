@@ -22,6 +22,9 @@ object Routes {
     const val TEAMS = "teams"
     const val TEAM_DETAIL = "team_detail/{teamId}"
 
+    const val CAPTAIN_TEAMS = "captain_teams"
+    const val CAPTAIN_TEAM_DETAIL = "captain_team_detail/{teamId}"
+
     const val USERS = "users"
     const val USER_DETAIL = "user_detail/{userId}"
     const val USER_CREATE = "user_create"
@@ -41,6 +44,10 @@ object Routes {
 
     fun teamDetail(teamId: Int): String {
         return "team_detail/$teamId"
+    }
+
+    fun captainTeamDetail(teamId: Int): String {
+        return "captain_team_detail/$teamId"
     }
 
     fun userDetail(userId: Int): String {

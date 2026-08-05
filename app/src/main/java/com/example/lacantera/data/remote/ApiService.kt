@@ -35,6 +35,7 @@ import com.example.lacantera.data.model.SeasonMutationResponse
 import com.example.lacantera.data.model.SeasonsResponse
 import com.example.lacantera.data.model.RefereeMatchDetailResponse
 import com.example.lacantera.data.model.RefereeMatchesResponse
+import com.example.lacantera.data.model.CaptainTeamsResponse
 import retrofit2.http.DELETE
 import retrofit2.http.Query
 import retrofit2.Response
@@ -64,6 +65,9 @@ interface ApiService {
 
     @GET("api/teams/")
     suspend fun getTeams(): Response<TeamsResponse>
+
+    @GET("api/teams/mine/")
+    suspend fun getCaptainTeams(): Response<CaptainTeamsResponse>
 
     @GET("api/teams/{teamId}/")
     suspend fun getTeamDetail(
