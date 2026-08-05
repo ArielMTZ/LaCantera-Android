@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.lacantera.ui.dashboard.AdminDashboardScreen
+import com.example.lacantera.ui.dashboard.CaptainDashboardScreen
 import com.example.lacantera.ui.dashboard.DashboardScreen
 import com.example.lacantera.ui.login.DashboardType
 import com.example.lacantera.ui.login.LoginScreen
@@ -28,6 +30,8 @@ import com.example.lacantera.ui.rules.RulesScreen
 import com.example.lacantera.ui.seasons.SeasonsScreen
 import com.example.lacantera.ui.splash.SplashScreen
 import com.example.lacantera.ui.sports.SportsScreen
+import com.example.lacantera.ui.teams.CaptainTeamDetailScreen
+import com.example.lacantera.ui.teams.CaptainTeamsScreen
 import com.example.lacantera.ui.teams.TeamDetailScreen
 import com.example.lacantera.ui.teams.TeamsScreen
 import com.example.lacantera.ui.users.CreateUserScreen
@@ -43,6 +47,12 @@ fun AppNavGraph() {
         navController = navController,
         startDestination = Routes.SPLASH
     ) {
+
+        /*
+         * =====================================================
+         * SPLASH
+         * =====================================================
+         */
 
         composable(Routes.SPLASH) {
             SplashScreen(
@@ -93,6 +103,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * INICIO PÚBLICO
+         * =====================================================
+         */
+
         composable(Routes.PUBLIC_HOME) {
             PublicHomeScreen(
                 onLoginClick = {
@@ -126,7 +142,7 @@ fun AppNavGraph() {
                     )
                 },
                 onStandingsClick = {
-                    // Posiciones
+                    // Posiciones públicas
                 },
                 onTeamsClick = {
                     // Equipos públicos
@@ -140,6 +156,12 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        /*
+         * =====================================================
+         * LOGIN
+         * =====================================================
+         */
 
         composable(Routes.LOGIN) {
             LoginScreen(
@@ -177,13 +199,19 @@ fun AppNavGraph() {
                     navController.popBackStack()
                 },
                 onForgotPasswordClick = {
-                    // Recuperación
+                    // Recuperación de contraseña
                 }
             )
         }
 
+        /*
+         * =====================================================
+         * DASHBOARD DEL ADMINISTRADOR
+         * =====================================================
+         */
+
         composable(Routes.DASHBOARD) {
-            DashboardScreen(
+            AdminDashboardScreen(
                 onLogout = {
                     navController.navigate(
                         Routes.PUBLIC_HOME
@@ -237,16 +265,15 @@ fun AppNavGraph() {
                     ) {
                         launchSingleTop = true
                     }
-                },
-                onNavigateToRefereeMatches = {
-                    navController.navigate(
-                        Routes.REFEREE_MATCHES
-                    ) {
-                        launchSingleTop = true
-                    }
                 }
             )
         }
+
+        /*
+         * =====================================================
+         * DASHBOARD DEL ÁRBITRO
+         * =====================================================
+         */
 
         composable(
             Routes.DASHBOARD_REFEREE
@@ -316,10 +343,16 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * DASHBOARD DEL CAPITÁN
+         * =====================================================
+         */
+
         composable(
             Routes.DASHBOARD_CAPTAIN
         ) {
-            DashboardScreen(
+            CaptainDashboardScreen(
                 onLogout = {
                     navController.navigate(
                         Routes.PUBLIC_HOME
@@ -346,37 +379,29 @@ fun AppNavGraph() {
                         launchSingleTop = true
                     }
                 },
-                onNavigateToSports = {
+
+                /*
+                 * IMPORTANTE:
+                 * El capitán ya no entra a Routes.TEAMS.
+                 * Ahora entra a su pantalla exclusiva.
+                 */
+                onNavigateToMyTeam = {
                     navController.navigate(
-                        Routes.SPORTS
+                        Routes.CAPTAIN_TEAMS
                     ) {
                         launchSingleTop = true
                     }
                 },
-                onNavigateToTeams = {
+                onNavigateToMatchdays = {
                     navController.navigate(
-                        Routes.TEAMS
+                        Routes.MATCHDAYS
                     ) {
                         launchSingleTop = true
                     }
                 },
-                onNavigateToUsers = {
-                    navController.navigate(
-                        Routes.USERS
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-                onNavigateToSeasons = {
+                onNavigateToSeason = {
                     navController.navigate(
                         Routes.SEASONS
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-                onNavigateToRefereeMatches = {
-                    navController.navigate(
-                        Routes.REFEREE_MATCHES
                     ) {
                         launchSingleTop = true
                     }
@@ -451,6 +476,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * DEPORTES
+         * =====================================================
+         */
+
         composable(Routes.SPORTS) {
             SportsScreen(
                 onBackClick = {
@@ -471,6 +502,12 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        /*
+         * =====================================================
+         * EQUIPOS DEL ADMINISTRADOR
+         * =====================================================
+         */
 
         composable(
             Routes.TEAMS
@@ -518,6 +555,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * DETALLE ADMINISTRATIVO DEL EQUIPO
+         * =====================================================
+         */
+
         composable(
             route = Routes.TEAM_DETAIL,
             arguments = listOf(
@@ -563,6 +606,103 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        /*
+         * =====================================================
+         * EQUIPOS DEL CAPITÁN
+         * =====================================================
+         */
+
+        composable(
+            Routes.CAPTAIN_TEAMS
+        ) { backStackEntry ->
+
+            val refreshCaptainTeams by backStackEntry
+                .savedStateHandle
+                .getStateFlow(
+                    key = "refresh_captain_teams",
+                    initialValue = false
+                )
+                .collectAsState()
+
+            CaptainTeamsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onTeamClick = { teamId ->
+                    navController.navigate(
+                        Routes.captainTeamDetail(teamId)
+                    )
+                },
+                refreshRequested = refreshCaptainTeams,
+                onRefreshConsumed = {
+                    backStackEntry
+                        .savedStateHandle[
+                        "refresh_captain_teams"
+                    ] = false
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.CAPTAIN_TEAMS
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        /*
+         * =====================================================
+         * DETALLE DEL EQUIPO PARA EL CAPITÁN
+         * =====================================================
+         */
+
+        composable(
+            route = Routes.CAPTAIN_TEAM_DETAIL,
+            arguments = listOf(
+                navArgument("teamId") {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+
+            val teamId = backStackEntry
+                .arguments
+                ?.getInt("teamId")
+                ?: return@composable
+
+            CaptainTeamDetailScreen(
+                teamId = teamId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSessionExpired = {
+                    navController.navigate(
+                        Routes.PUBLIC_HOME
+                    ) {
+                        popUpTo(
+                            Routes.CAPTAIN_TEAMS
+                        ) {
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        /*
+         * =====================================================
+         * USUARIOS
+         * =====================================================
+         */
 
         composable(
             Routes.USERS
@@ -615,6 +755,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * DETALLE DEL USUARIO
+         * =====================================================
+         */
+
         composable(
             route = Routes.USER_DETAIL,
             arguments = listOf(
@@ -661,6 +807,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * CREAR USUARIO
+         * =====================================================
+         */
+
         composable(
             Routes.USER_CREATE
         ) {
@@ -695,6 +847,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * TEMPORADAS
+         * =====================================================
+         */
+
         composable(
             Routes.SEASONS
         ) {
@@ -718,6 +876,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * PROGRAMAS
+         * =====================================================
+         */
+
         composable(Routes.PROGRAMS) {
             PublicInformationScreen(
                 title = "Programas",
@@ -731,6 +895,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * REGLAS
+         * =====================================================
+         */
+
         composable(Routes.RULES) {
             RulesScreen(
                 onBackClick = {
@@ -738,6 +908,12 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        /*
+         * =====================================================
+         * PRIVACIDAD
+         * =====================================================
+         */
 
         composable(Routes.PRIVACY) {
             PublicInformationScreen(
@@ -752,6 +928,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * TÉRMINOS
+         * =====================================================
+         */
+
         composable(Routes.TERMS) {
             PublicInformationScreen(
                 title = "Términos y condiciones",
@@ -765,6 +947,12 @@ fun AppNavGraph() {
             )
         }
 
+        /*
+         * =====================================================
+         * SOPORTE
+         * =====================================================
+         */
+
         composable(Routes.SUPPORT) {
             PublicInformationScreen(
                 title = "Soporte",
@@ -777,6 +965,12 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        /*
+         * =====================================================
+         * JORNADAS
+         * =====================================================
+         */
 
         composable(Routes.MATCHDAYS) {
             MatchdaysScreen(
@@ -793,7 +987,9 @@ fun AppNavGraph() {
                         launchSingleTop = true
                     }
                 },
-                onRolesClick = {},
+                onRolesClick = {
+                    // Roles
+                },
                 onLoginClick = {
                     navController.navigate(
                         Routes.LOGIN
@@ -813,6 +1009,12 @@ fun AppNavGraph() {
         }
     }
 }
+
+/*
+ * =========================================================
+ * PANTALLA PÚBLICA TEMPORAL
+ * =========================================================
+ */
 
 @Composable
 private fun PublicInformationScreen(

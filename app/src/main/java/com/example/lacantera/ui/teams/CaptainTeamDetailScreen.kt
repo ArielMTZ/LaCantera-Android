@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,11 +28,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,28 +50,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-private val DetailBackground = Color(0xFFF4F6FA)
-private val DetailSurface = Color(0xFFFFFFFF)
+/*
+ * =========================================================
+ * COLORES DE LA VISTA DEL CAPITÁN
+ * =========================================================
+ */
 
-private val DetailNavy = Color(0xFF071E4B)
-private val DetailNavyLight = Color(0xFF17468A)
-private val DetailBlue = Color(0xFF2463B6)
+private val CaptainTeamBackground = Color(0xFFF3F6FB)
+private val CaptainTeamSurface = Color(0xFFFFFFFF)
 
-private val DetailText = Color(0xFF111C35)
-private val DetailMuted = Color(0xFF68748A)
-private val DetailBorder = Color(0xFFDDE4EE)
+private val CaptainTeamNavy = Color(0xFF071E4B)
+private val CaptainTeamNavyLight = Color(0xFF163E7A)
+private val CaptainTeamBlue = Color(0xFF2463B6)
 
-private val DetailBlueSoft = Color(0xFFE9F2FF)
-private val DetailGreen = Color(0xFF168052)
-private val DetailGreenSoft = Color(0xFFE8F7EF)
-private val DetailRed = Color(0xFFC62828)
-private val DetailRedSoft = Color(0xFFFFE9EA)
+private val CaptainTeamText = Color(0xFF111C35)
+private val CaptainTeamMuted = Color(0xFF68748A)
+private val CaptainTeamBorder = Color(0xFFDCE4EF)
+
+private val CaptainTeamGreen = Color(0xFF168052)
+private val CaptainTeamGreenSoft = Color(0xFFE8F7EF)
+
+private val CaptainTeamRed = Color(0xFFC62828)
+private val CaptainTeamRedSoft = Color(0xFFFFE9EA)
+
+private val CaptainTeamBlueSoft = Color(0xFFEAF2FF)
+private val CaptainTeamOrange = Color(0xFFB76500)
+private val CaptainTeamOrangeSoft = Color(0xFFFFF1E2)
+
+/*
+ * =========================================================
+ * PANTALLA PRINCIPAL
+ * =========================================================
+ */
 
 @Composable
-fun TeamDetailScreen(
+fun CaptainTeamDetailScreen(
     teamId: Int,
     onBackClick: () -> Unit,
-    onUpdateCompleted: () -> Unit,
     onSessionExpired: () -> Unit,
     viewModel: TeamDetailViewModel = viewModel()
 ) {
@@ -93,17 +103,10 @@ fun TeamDetailScreen(
         }
     }
 
-    LaunchedEffect(uiState.updateCompleted) {
-        if (uiState.updateCompleted) {
-            viewModel.consumeUpdateCompleted()
-            onUpdateCompleted()
-        }
-    }
-
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(DetailBackground)
+            .background(CaptainTeamBackground)
     ) {
         val compactScreen = maxWidth < 370.dp
 
@@ -112,20 +115,19 @@ fun TeamDetailScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .imePadding()
         ) {
-            TeamDetailTopBar(
+            CaptainTeamTopBar(
                 onBackClick = onBackClick,
                 compactScreen = compactScreen
             )
 
             when {
                 uiState.isLoading -> {
-                    TeamDetailLoading()
+                    CaptainTeamLoadingState()
                 }
 
                 uiState.team == null -> {
-                    TeamDetailErrorState(
+                    CaptainTeamErrorState(
                         message = uiState.errorMessage
                             ?: "No fue posible cargar la información del equipo.",
                         onRetry = {
@@ -135,7 +137,7 @@ fun TeamDetailScreen(
                 }
 
                 else -> {
-                    val team = uiState.team
+                    val team = uiState.team ?: return@Column
 
                     Column(
                         modifier = Modifier
@@ -158,104 +160,32 @@ fun TeamDetailScreen(
                                 .fillMaxWidth()
                                 .widthIn(max = 620.dp)
                         ) {
-                            TeamIdentityCard(
-                                name = uiState.nombre.ifBlank {
-                                    team?.nombre.orEmpty()
-                                },
-                                sport = team?.deporte.orEmpty(),
-                                category = team?.categoria.orEmpty(),
-                                isActive = uiState.activo
+                            CaptainTeamHeroCard(
+                                teamName = team.nombre,
+                                sport = team.deporte,
+                                category = team.categoria,
+                                isActive = team.activo
                             )
 
-                            Spacer(modifier = Modifier.height(18.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            TeamFormSection(
-                                name = uiState.nombre,
-                                isSaving = uiState.isSaving,
-                                onNameChange = viewModel::onNombreChanged
+                            CaptainTeamInformationCard(
+                                sport = team.deporte,
+                                category = team.categoria,
+                                isActive = team.activo
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
 
-                            TeamStatusSection(
-                                isActive = uiState.activo,
-                                isSaving = uiState.isSaving,
-                                onActiveChange = viewModel::onActivoChanged
-                            )
+                            CaptainPermissionCard()
 
                             uiState.errorMessage?.let { message ->
                                 Spacer(modifier = Modifier.height(14.dp))
 
-                                TeamMessageCard(
-                                    message = message,
-                                    isError = true
+                                CaptainTeamMessageCard(
+                                    message = message
                                 )
                             }
-
-                            uiState.successMessage?.let { message ->
-                                Spacer(modifier = Modifier.height(14.dp))
-
-                                TeamMessageCard(
-                                    message = message,
-                                    isError = false
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            Button(
-                                onClick = viewModel::updateTeam,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp),
-                                enabled = !uiState.isSaving &&
-                                        uiState.nombre.isNotBlank(),
-                                shape = RoundedCornerShape(18.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = DetailNavy,
-                                    contentColor = Color.White,
-                                    disabledContainerColor = DetailNavy.copy(
-                                        alpha = 0.45f
-                                    ),
-                                    disabledContentColor = Color.White.copy(
-                                        alpha = 0.75f
-                                    )
-                                )
-                            ) {
-                                if (uiState.isSaving) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(21.dp),
-                                        color = Color.White,
-                                        strokeWidth = 2.dp
-                                    )
-
-                                    Spacer(modifier = Modifier.width(10.dp))
-
-                                    Text(
-                                        text = "Guardando cambios...",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                } else {
-                                    Text(
-                                        text = "GUARDAR CAMBIOS",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        letterSpacing = 0.4.sp
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Text(
-                                text = "Los cambios se actualizarán en la información general del equipo.",
-                                modifier = Modifier.fillMaxWidth(),
-                                color = DetailMuted,
-                                fontSize = 11.sp,
-                                lineHeight = 16.sp,
-                                textAlign = TextAlign.Center
-                            )
 
                             Spacer(modifier = Modifier.height(24.dp))
                         }
@@ -266,15 +196,21 @@ fun TeamDetailScreen(
     }
 }
 
+/*
+ * =========================================================
+ * BARRA SUPERIOR
+ * =========================================================
+ */
+
 @Composable
-private fun TeamDetailTopBar(
+private fun CaptainTeamTopBar(
     onBackClick: () -> Unit,
     compactScreen: Boolean
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(DetailSurface)
+            .background(CaptainTeamSurface)
             .padding(
                 horizontal = if (compactScreen) {
                     14.dp
@@ -290,10 +226,10 @@ private fun TeamDetailTopBar(
                 .align(Alignment.CenterStart)
                 .clickable(onClick = onBackClick),
             shape = RoundedCornerShape(15.dp),
-            color = DetailBackground,
+            color = CaptainTeamBackground,
             border = BorderStroke(
                 width = 1.dp,
-                color = DetailBorder
+                color = CaptainTeamBorder
             )
         ) {
             Row(
@@ -305,7 +241,7 @@ private fun TeamDetailTopBar(
             ) {
                 Text(
                     text = "‹",
-                    color = DetailNavy,
+                    color = CaptainTeamNavy,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -314,7 +250,7 @@ private fun TeamDetailTopBar(
 
                 Text(
                     text = "Volver",
-                    color = DetailNavy,
+                    color = CaptainTeamNavy,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -326,8 +262,8 @@ private fun TeamDetailTopBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Editar equipo",
-                color = DetailText,
+                text = "Mi equipo",
+                color = CaptainTeamText,
                 fontSize = if (compactScreen) {
                     17.sp
                 } else {
@@ -337,8 +273,8 @@ private fun TeamDetailTopBar(
             )
 
             Text(
-                text = "Administración",
-                color = DetailMuted,
+                text = "Panel del capitán",
+                color = CaptainTeamMuted,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -349,12 +285,12 @@ private fun TeamDetailTopBar(
                 .align(Alignment.CenterEnd)
                 .size(40.dp),
             shape = RoundedCornerShape(14.dp),
-            color = DetailNavy
+            color = CaptainTeamNavy
         ) {
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                TeamDetailShieldIcon(
+                CaptainTeamShieldIcon(
                     tint = Color.White,
                     modifier = Modifier.size(22.dp)
                 )
@@ -363,21 +299,27 @@ private fun TeamDetailTopBar(
     }
 }
 
+/*
+ * =========================================================
+ * ENCABEZADO DEL EQUIPO
+ * =========================================================
+ */
+
 @Composable
-private fun TeamIdentityCard(
-    name: String,
+private fun CaptainTeamHeroCard(
+    teamName: String,
     sport: String,
     category: String,
     isActive: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(29.dp),
         colors = CardDefaults.cardColors(
-            containerColor = DetailNavy
+            containerColor = CaptainTeamNavy
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 7.dp
         )
     ) {
         Box(
@@ -386,13 +328,13 @@ private fun TeamIdentityCard(
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            DetailNavy,
-                            DetailNavyLight,
-                            DetailBlue
+                            CaptainTeamNavy,
+                            CaptainTeamNavyLight,
+                            CaptainTeamBlue
                         )
                     )
                 )
-                .padding(20.dp)
+                .padding(21.dp)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -413,7 +355,7 @@ private fun TeamIdentityCard(
                         Box(
                             contentAlignment = Alignment.Center
                         ) {
-                            TeamDetailShieldIcon(
+                            CaptainTeamShieldIcon(
                                 tint = Color.White,
                                 modifier = Modifier.size(33.dp)
                             )
@@ -426,21 +368,21 @@ private fun TeamIdentityCard(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "INFORMACIÓN DEL EQUIPO",
+                            text = "EQUIPO DEL CAPITÁN",
                             color = Color.White.copy(alpha = 0.62f),
                             fontSize = 9.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 0.7.sp
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
-                            text = name.ifBlank {
+                            text = teamName.ifBlank {
                                 "Equipo sin nombre"
                             },
                             color = Color.White,
-                            fontSize = 22.sp,
+                            fontSize = 23.sp,
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -464,7 +406,7 @@ private fun TeamIdentityCard(
                                     }
                                 )
                             },
-                            color = Color.White.copy(alpha = 0.74f),
+                            color = Color.White.copy(alpha = 0.75f),
                             fontSize = 11.sp,
                             lineHeight = 16.sp,
                             maxLines = 2,
@@ -473,32 +415,7 @@ private fun TeamIdentityCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TeamHeaderData(
-                        label = "DEPORTE",
-                        value = sport.ifBlank {
-                            "No asignado"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    TeamHeaderData(
-                        label = "CATEGORÍA",
-                        value = category.ifBlank {
-                            "No asignada"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(19.dp))
 
                 Surface(
                     shape = RoundedCornerShape(50.dp),
@@ -556,60 +473,27 @@ private fun TeamIdentityCard(
     }
 }
 
-@Composable
-private fun TeamHeaderData(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(15.dp),
-        color = Color.White.copy(alpha = 0.11f)
-    ) {
-        Column(
-            modifier = Modifier.padding(
-                horizontal = 12.dp,
-                vertical = 10.dp
-            )
-        ) {
-            Text(
-                text = label,
-                color = Color.White.copy(alpha = 0.58f),
-                fontSize = 8.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 0.5.sp
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = value,
-                color = Color.White,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
+/*
+ * =========================================================
+ * INFORMACIÓN GENERAL
+ * =========================================================
+ */
 
 @Composable
-private fun TeamFormSection(
-    name: String,
-    isSaving: Boolean,
-    onNameChange: (String) -> Unit
+private fun CaptainTeamInformationCard(
+    sport: String,
+    category: String,
+    isActive: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(23.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = DetailSurface
+            containerColor = CaptainTeamSurface
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = DetailBorder
+            color = CaptainTeamBorder
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
@@ -621,8 +505,8 @@ private fun TeamFormSection(
                 .padding(18.dp)
         ) {
             Text(
-                text = "Datos del equipo",
-                color = DetailText,
+                text = "Información general",
+                color = CaptainTeamText,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.ExtraBold
             )
@@ -630,225 +514,212 @@ private fun TeamFormSection(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Actualiza el nombre con el que aparecerá en los listados.",
-                color = DetailMuted,
-                fontSize = 12.sp,
-                lineHeight = 17.sp
+                text = "Datos oficiales registrados para este equipo.",
+                color = CaptainTeamMuted,
+                fontSize = 11.sp,
+                lineHeight = 16.sp
             )
 
             Spacer(modifier = Modifier.height(17.dp))
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = onNameChange,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSaving,
-                singleLine = true,
-                shape = RoundedCornerShape(17.dp),
-                label = {
-                    Text("Nombre del equipo")
+            CaptainInformationRow(
+                letter = "D",
+                title = "Deporte",
+                value = sport.ifBlank {
+                    "No asignado"
                 },
-                placeholder = {
-                    Text("Escribe el nombre del equipo")
+                backgroundColor = CaptainTeamBlueSoft,
+                contentColor = CaptainTeamBlue
+            )
+
+            Spacer(modifier = Modifier.height(11.dp))
+
+            CaptainInformationRow(
+                letter = "C",
+                title = "Categoría",
+                value = category.ifBlank {
+                    "No asignada"
                 },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = DetailBackground,
-                    unfocusedContainerColor = DetailBackground,
-                    disabledContainerColor = DetailBackground,
+                backgroundColor = CaptainTeamOrangeSoft,
+                contentColor = CaptainTeamOrange
+            )
 
-                    focusedBorderColor = DetailBlue,
-                    unfocusedBorderColor = DetailBorder,
-                    disabledBorderColor = DetailBorder,
+            Spacer(modifier = Modifier.height(11.dp))
 
-                    focusedTextColor = DetailText,
-                    unfocusedTextColor = DetailText,
-                    disabledTextColor = DetailMuted,
-
-                    focusedLabelColor = DetailNavy,
-                    unfocusedLabelColor = DetailMuted,
-
-                    cursorColor = DetailNavy
-                )
+            CaptainInformationRow(
+                letter = if (isActive) {
+                    "✓"
+                } else {
+                    "!"
+                },
+                title = "Estado del equipo",
+                value = if (isActive) {
+                    "Activo"
+                } else {
+                    "Inactivo"
+                },
+                backgroundColor = if (isActive) {
+                    CaptainTeamGreenSoft
+                } else {
+                    CaptainTeamRedSoft
+                },
+                contentColor = if (isActive) {
+                    CaptainTeamGreen
+                } else {
+                    CaptainTeamRed
+                }
             )
         }
     }
 }
 
 @Composable
-private fun TeamStatusSection(
-    isActive: Boolean,
-    isSaving: Boolean,
-    onActiveChange: (Boolean) -> Unit
+private fun CaptainInformationRow(
+    letter: String,
+    title: String,
+    value: String,
+    backgroundColor: Color,
+    contentColor: Color
 ) {
-    val accentColor = if (isActive) {
-        DetailGreen
-    } else {
-        DetailRed
-    }
-
-    val backgroundColor = if (isActive) {
-        DetailGreenSoft
-    } else {
-        DetailRedSoft
-    }
-
-    Card(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(23.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = DetailSurface
-        ),
+        shape = RoundedCornerShape(18.dp),
+        color = CaptainTeamBackground,
         border = BorderStroke(
             width = 1.dp,
-            color = DetailBorder
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
+            color = CaptainTeamBorder.copy(alpha = 0.75f)
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
+            modifier = Modifier.padding(
+                horizontal = 14.dp,
+                vertical = 13.dp
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.size(43.dp),
+                shape = RoundedCornerShape(14.dp),
                 color = backgroundColor
             ) {
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (isActive) {
-                            "✓"
-                        } else {
-                            "!"
-                        },
-                        color = accentColor,
-                        fontSize = 19.sp,
+                        text = letter,
+                        color = contentColor,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(13.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = if (isActive) {
-                        "Equipo disponible"
-                    } else {
-                        "Equipo desactivado"
-                    },
-                    color = DetailText,
-                    fontSize = 15.sp,
+                    text = title.uppercase(),
+                    color = CaptainTeamMuted,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 0.5.sp
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = value,
+                    color = CaptainTeamText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+/*
+ * =========================================================
+ * AVISO DE PERMISOS
+ * =========================================================
+ */
+
+@Composable
+private fun CaptainPermissionCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(21.dp),
+        color = CaptainTeamBlueSoft,
+        border = BorderStroke(
+            width = 1.dp,
+            color = CaptainTeamBlue.copy(alpha = 0.14f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 16.dp,
+                vertical = 15.dp
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(45.dp),
+                shape = RoundedCornerShape(15.dp),
+                color = CaptainTeamBlue.copy(alpha = 0.12f)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "i",
+                        color = CaptainTeamBlue,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Vista para capitán",
+                    color = CaptainTeamText,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
 
                 Spacer(modifier = Modifier.height(3.dp))
 
                 Text(
-                    text = if (isActive) {
-                        "El equipo aparecerá en los listados y módulos disponibles."
-                    } else {
-                        "El equipo permanecerá oculto en los listados activos."
-                    },
-                    color = DetailMuted,
-                    fontSize = 11.sp,
-                    lineHeight = 16.sp
+                    text = (
+                            "Puedes consultar la información del equipo. " +
+                                    "La activación o desactivación corresponde " +
+                                    "únicamente a los administradores."
+                            ),
+                    color = CaptainTeamMuted,
+                    fontSize = 10.sp,
+                    lineHeight = 15.sp
                 )
             }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Switch(
-                checked = isActive,
-                onCheckedChange = onActiveChange,
-                enabled = !isSaving,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = DetailGreen,
-                    checkedBorderColor = DetailGreen,
-
-                    uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = DetailMuted.copy(alpha = 0.45f),
-                    uncheckedBorderColor = DetailMuted.copy(alpha = 0.35f),
-
-                    disabledCheckedTrackColor = DetailGreen.copy(
-                        alpha = 0.45f
-                    ),
-                    disabledUncheckedTrackColor = DetailMuted.copy(
-                        alpha = 0.25f
-                    )
-                )
-            )
         }
     }
 }
 
-@Composable
-private fun TeamMessageCard(
-    message: String,
-    isError: Boolean
-) {
-    val backgroundColor = if (isError) {
-        DetailRedSoft
-    } else {
-        DetailGreenSoft
-    }
-
-    val contentColor = if (isError) {
-        DetailRed
-    } else {
-        DetailGreen
-    }
-
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(17.dp),
-        color = backgroundColor,
-        border = BorderStroke(
-            width = 1.dp,
-            color = contentColor.copy(alpha = 0.18f)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(
-                horizontal = 15.dp,
-                vertical = 13.dp
-            ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = if (isError) {
-                    "!"
-                } else {
-                    "✓"
-                },
-                color = contentColor,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Text(
-                text = message,
-                color = contentColor,
-                fontSize = 12.sp,
-                lineHeight = 17.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
-}
+/*
+ * =========================================================
+ * CARGA
+ * =========================================================
+ */
 
 @Composable
-private fun TeamDetailLoading() {
+private fun CaptainTeamLoadingState() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -858,13 +729,13 @@ private fun TeamDetailLoading() {
         ) {
             Surface(
                 modifier = Modifier.size(70.dp),
-                shape = RoundedCornerShape(22.dp),
-                color = DetailNavy
+                shape = RoundedCornerShape(23.dp),
+                color = CaptainTeamNavy
             ) {
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
-                    TeamDetailShieldIcon(
+                    CaptainTeamShieldIcon(
                         tint = Color.White,
                         modifier = Modifier.size(35.dp)
                     )
@@ -874,15 +745,15 @@ private fun TeamDetailLoading() {
             Spacer(modifier = Modifier.height(18.dp))
 
             CircularProgressIndicator(
-                color = DetailNavy,
+                color = CaptainTeamNavy,
                 strokeWidth = 3.dp
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Cargando información...",
-                color = DetailMuted,
+                text = "Cargando tu equipo...",
+                color = CaptainTeamMuted,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -890,8 +761,14 @@ private fun TeamDetailLoading() {
     }
 }
 
+/*
+ * =========================================================
+ * ERROR
+ * =========================================================
+ */
+
 @Composable
-private fun TeamDetailErrorState(
+private fun CaptainTeamErrorState(
     message: String,
     onRetry: () -> Unit
 ) {
@@ -907,11 +784,11 @@ private fun TeamDetailErrorState(
                 .widthIn(max = 460.dp),
             shape = RoundedCornerShape(25.dp),
             colors = CardDefaults.cardColors(
-                containerColor = DetailSurface
+                containerColor = CaptainTeamSurface
             ),
             border = BorderStroke(
                 width = 1.dp,
-                color = DetailBorder
+                color = CaptainTeamBorder
             )
         ) {
             Column(
@@ -923,14 +800,14 @@ private fun TeamDetailErrorState(
                 Surface(
                     modifier = Modifier.size(62.dp),
                     shape = RoundedCornerShape(20.dp),
-                    color = DetailRedSoft
+                    color = CaptainTeamRedSoft
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "!",
-                            color = DetailRed,
+                            color = CaptainTeamRed,
                             fontSize = 26.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -941,7 +818,7 @@ private fun TeamDetailErrorState(
 
                 Text(
                     text = "No se pudo cargar el equipo",
-                    color = DetailText,
+                    color = CaptainTeamText,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center
@@ -951,7 +828,7 @@ private fun TeamDetailErrorState(
 
                 Text(
                     text = message,
-                    color = DetailMuted,
+                    color = CaptainTeamMuted,
                     fontSize = 12.sp,
                     lineHeight = 18.sp,
                     textAlign = TextAlign.Center
@@ -966,7 +843,7 @@ private fun TeamDetailErrorState(
                         .height(50.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = DetailNavy,
+                        containerColor = CaptainTeamNavy,
                         contentColor = Color.White
                     )
                 ) {
@@ -981,7 +858,54 @@ private fun TeamDetailErrorState(
 }
 
 @Composable
-private fun TeamDetailShieldIcon(
+private fun CaptainTeamMessageCard(
+    message: String
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = CaptainTeamRedSoft,
+        border = BorderStroke(
+            width = 1.dp,
+            color = CaptainTeamRed.copy(alpha = 0.16f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 15.dp,
+                vertical = 13.dp
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "!",
+                color = CaptainTeamRed,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Text(
+                text = message,
+                modifier = Modifier.weight(1f),
+                color = CaptainTeamRed,
+                fontSize = 12.sp,
+                lineHeight = 17.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+/*
+ * =========================================================
+ * ICONO DEL EQUIPO
+ * =========================================================
+ */
+
+@Composable
+private fun CaptainTeamShieldIcon(
     tint: Color,
     modifier: Modifier = Modifier
 ) {
