@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.lacantera.data.local.SessionManager
 import com.example.lacantera.data.model.Usuario
 import com.example.lacantera.data.repository.AuthRepository
+import com.example.lacantera.data.wear.WearSessionSender
 import com.example.lacantera.ui.login.DashboardType
 import com.example.lacantera.ui.login.LoginUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,19 +27,29 @@ class LoginViewModel(
         context = application.applicationContext
     )
 
-    private val _uiState = MutableStateFlow(LoginUiState())
+    private val wearSessionSender = WearSessionSender(
+        context = application.applicationContext
+    )
+
+    private val _uiState = MutableStateFlow(
+        LoginUiState()
+    )
 
     val uiState: StateFlow<LoginUiState> =
         _uiState.asStateFlow()
 
-    fun onUsernameChange(username: String) {
+    fun onUsernameChange(
+        username: String
+    ) {
         _uiState.value = _uiState.value.copy(
             username = username,
             errorMessage = null
         )
     }
 
-    fun onPasswordChange(password: String) {
+    fun onPasswordChange(
+        password: String
+    ) {
         _uiState.value = _uiState.value.copy(
             password = password,
             errorMessage = null
@@ -46,8 +57,11 @@ class LoginViewModel(
     }
 
     fun login() {
-        val username = _uiState.value.username.trim()
-        val password = _uiState.value.password
+        val username =
+            _uiState.value.username.trim()
+
+        val password =
+            _uiState.value.password
 
         if (username.isBlank()) {
             _uiState.value = _uiState.value.copy(
@@ -81,91 +95,139 @@ class LoginViewModel(
                     val body = response.body()
 
                     if (body == null) {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            errorMessage = "El servidor respondió sin datos."
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = (
+                                        "El servidor respondió " +
+                                                "sin datos."
+                                        )
+                            )
+
                         return@launch
                     }
 
-                    val dashboardType = resolveDashboardType(
-                        usuario = body.usuario
-                    )
+                    val dashboardType =
+                        resolveDashboardType(
+                            usuario = body.usuario
+                        )
 
-                    /*
-                     * Protección adicional en Android.
-                     * Normalmente el backend también debe rechazar
-                     * a los jugadores que no sean capitanes.
-                     */
                     if (dashboardType == null) {
                         sessionManager.clearSession()
 
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            loginSuccess = false,
-                            dashboardType = null,
-                            usuario = null,
-                            errorMessage = "Solo administradores, árbitros y capitanes pueden iniciar sesión."
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isLoading = false,
+                                loginSuccess = false,
+                                dashboardType = null,
+                                usuario = null,
+                                errorMessage = (
+                                        "Solo administradores, " +
+                                                "árbitros y capitanes " +
+                                                "pueden iniciar sesión."
+                                        )
+                            )
 
                         return@launch
                     }
 
-                    /*
-                     * Guardamos tipoUsuario porque representa mejor
-                     * el acceso real calculado por el backend.
-                     */
-                    val sessionRole = body.usuario.tipoUsuario
-                        .ifBlank { body.usuario.rol }
+                    val sessionRole =
+                        body.usuario.tipoUsuario
+                            .ifBlank {
+                                body.usuario.rol
+                            }
 
                     sessionManager.saveSession(
                         accessToken = body.access,
                         refreshToken = body.refresh,
                         userId = body.usuario.id,
-                        username = body.usuario.username,
-                        nombreCorto = body.usuario.nombreCorto,
+                        username =
+                            body.usuario.username,
+                        nombreCorto =
+                            body.usuario.nombreCorto,
                         rol = sessionRole
                     )
 
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        loginSuccess = true,
+                    /*
+                     * Envía la sesión al reloj conectado.
+                     * No bloquea el login del teléfono.
+                     */
+                    wearSessionSender.sendSession(
                         usuario = body.usuario,
-                        dashboardType = dashboardType,
-                        errorMessage = null
+                        accessToken = body.access,
+                        refreshToken = body.refresh
                     )
+
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isLoading = false,
+                            loginSuccess = true,
+                            usuario = body.usuario,
+                            dashboardType =
+                                dashboardType,
+                            errorMessage = null
+                        )
                 } else {
-                    val message = when (response.code()) {
-                        400 -> "Revisa los datos ingresados."
-                        401 -> "Usuario o contraseña incorrectos."
-                        403 -> "No tienes permiso para iniciar sesión."
-                        404 -> "No se encontró el servicio de inicio de sesión."
-                        500 -> "Ocurrió un error en el servidor."
-                        else -> "No fue posible iniciar sesión."
+                    val message = when (
+                        response.code()
+                    ) {
+                        400 -> {
+                            "Revisa los datos ingresados."
+                        }
+
+                        401 -> {
+                            "Usuario o contraseña incorrectos."
+                        }
+
+                        403 -> {
+                            "No tienes permiso para iniciar sesión."
+                        }
+
+                        404 -> {
+                            "No se encontró el servicio de inicio de sesión."
+                        }
+
+                        500 -> {
+                            "Ocurrió un error en el servidor."
+                        }
+
+                        else -> {
+                            "No fue posible iniciar sesión."
+                        }
                     }
 
-                    _uiState.value = _uiState.value.copy(
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isLoading = false,
+                            loginSuccess = false,
+                            dashboardType = null,
+                            errorMessage = message
+                        )
+                }
+            } catch (exception: IOException) {
+                _uiState.value =
+                    _uiState.value.copy(
                         isLoading = false,
                         loginSuccess = false,
                         dashboardType = null,
-                        errorMessage = message
+                        errorMessage = (
+                                "Error de conexión: " +
+                                        exception.message
+                                )
                     )
-                }
-            } catch (exception: IOException) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    loginSuccess = false,
-                    dashboardType = null,
-                    errorMessage = "Error de conexión: ${exception.message}"
-                )
             } catch (exception: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    loginSuccess = false,
-                    dashboardType = null,
-                    errorMessage = exception.message
-                        ?: "Ocurrió un error inesperado."
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        isLoading = false,
+                        loginSuccess = false,
+                        dashboardType = null,
+                        errorMessage =
+                            exception.message
+                                ?: (
+                                        "Ocurrió un error " +
+                                                "inesperado."
+                                        )
+                    )
             }
         }
     }
@@ -199,23 +261,13 @@ class LoginViewModel(
                 DashboardType.ADMIN
             }
 
-            tipoUsuario == "arbitro" -> {
+            tipoUsuario == "arbitro" ||
+                    rol == "arbitro" -> {
                 DashboardType.REFEREE
             }
 
-            rol == "arbitro" -> {
-                DashboardType.REFEREE
-            }
-
-            usuario.isCapitan -> {
-                DashboardType.CAPTAIN
-            }
-
-            tipoUsuario == "capitan" -> {
-                DashboardType.CAPTAIN
-            }
-
-            rol == "capitan" -> {
+            usuario.isCapitan ||
+                    tipoUsuario == "capitan" -> {
                 DashboardType.CAPTAIN
             }
 
@@ -232,10 +284,10 @@ class LoginViewModel(
 
     private companion object {
         val ADMIN_ROLES = setOf(
+            "superadmin",
+            "staff",
             "admin",
-            "admin_principal",
-            "subadmin",
-            "finanzas"
+            "admin_principal"
         )
     }
 }

@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "La Cantera"
 include(":app")
+include(":wear")
